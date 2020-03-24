@@ -40,21 +40,21 @@ ylabel('Robust Beta-Weights')
 % % Manually record outliers. Include observations with outlier residuals
 % and unusually low weights computed using robust regression. (0 indicates
 % no outliers)
-outliers.fa_b_ca1 = 54;
-outliers.fa_b_ca23 = 12;
-outliers.fa_b_sub = 9;
+outliers.fa_b_ca1 = [54];
+outliers.fa_b_ca23 = [12 54];
+outliers.fa_b_sub = [54];
 
-outliers.ad_b_ca1 = 54;
-outliers.ad_b_ca23 = 12;
-outliers.ad_b_sub = 0;
+outliers.ad_b_ca1 = [54];
+outliers.ad_b_ca23 = [12 54];
+outliers.ad_b_sub = [54];
 
-outliers.rd_b_ca1 = 54;
-outliers.rd_b_ca23 = 0;
-outliers.rd_b_sub = 0;
+outliers.rd_b_ca1 = [54];
+outliers.rd_b_ca23 = [54];
+outliers.rd_b_sub = [54];
 
-outliers.md_b_ca1 = 54;
-outliers.md_b_ca23 = 0;
-outliers.md_b_sub = 0;
+outliers.md_b_ca1 = [54];
+outliers.md_b_ca23 = [54];
+outliers.md_b_sub = [54];
 
 save('devti_remove_statoutliers.mat', 'outliers')
 

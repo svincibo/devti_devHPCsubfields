@@ -11,23 +11,24 @@ subregion = {'b_ca1', 'b_ca23', 'b_sub'};
 
 % Load removals: statistical outliers.
 load('devti_remove_statoutliers.mat')
-
+% 
 % % Load removals: motion.
-% load('devti_remove_motion.mat')
+% load('devti_remove_motionoutliers.mat')
 % 
 % % Load removals: snr.
-% load('devti_remove_snr.mat')
+% load('devti_remove_snroutliers.mat')
+% % Note: no datasets were removed due to unusually low snr
 
 degp = 1;
 
 % Make up the sex covariate for now.
 % sex = Shuffle(cat(1, ones(29, 1), 2*ones(29, 1)));
 
-for w = 1%:length(wm)
+for w = 1:length(wm)
     
     load(['devti_data_' wm{w} '.mat'])
     
-    for r = 1%:length(subregion)
+    for r = 1:length(subregion)
         
         % Select outliers to remove.
         if strcmp(wm{w}, 'fa') && strcmp(subregion{r}, 'b_ca1')

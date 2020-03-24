@@ -246,3 +246,9 @@ print(fullfile(rootDir, 'plots', ['plot_barplot_snr_' include]), '-dpng')
 print(fullfile(rootDir, 'plots', 'eps', ['plot_barplot_snr_' include]), '-depsc')
 
 hold off;
+
+% Manually record outliers. Include observations with unusually low SNR. 
+% (0 indicates no outliers)
+outliers.snr = 0;
+
+save('devti_remove_snroutliers.mat', 'outliers')
