@@ -162,7 +162,9 @@ for w = 2%1:length(wm)
         end
         
         % Correct AIC for sample size and predictor number: AICc.
-        aicc = mdlr_nlim.ModelCriterion.AIC + 2*size(mdlr_nlim.PredictorNames, 1)*((size(mdlr_nlim.PredictorNames, 1) + 1)/(size(mdlr_nlim.ObservationInfo, 1) - size(mdlr_nlim.PredictorNames, 1) - 1));
+        k = size(mdlr_nlim.PredictorNames, 1);
+        n = size(mdlr_nlim.ObservationInfo, 1); 
+        aicc = mdlr_nlim.ModelCriterion.AIC + ((2*k^2 + k)/(n - k - 1)));
         
         % Get AIC value corrected for sample size: AICc.
         disp(['AICc for ' wm{w} ' in ' subregion{r} ' using a model including nonlinear interactions is ' num2str(aicc) '.']);
