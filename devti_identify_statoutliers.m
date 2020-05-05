@@ -6,10 +6,10 @@
 clear all; close all; clc
 format long g
 
-load('devti_data_ad.mat')
+load('/Volumes/240/devti_devHPCsubfields/supportFiles/devti_data_md_mrtrix3act.mat')
 
 % Independent Variable
-y = m(strcmp(roi, 'b_ca23'));
+y = m(strcmp(roi, 'b_dg'));
         
 % Dependent Variables
 x = transpose(age);
@@ -39,24 +39,29 @@ ylabel('Robust Beta-Weights')
                
 % % Manually record outliers. Include observations with outlier residuals
 % and unusually low weights computed using robust regression. (0 indicates
-% no outliers)
-outliers.fa_b_ca1 = [54];
-outliers.fa_b_ca23 = [12 54];
-outliers.fa_b_sub = [54];
+% no outliers). 90 is included because it is an outlier in motion.
+% Also: subs 6 and 90 had FA <=1.15 which is too low.
+outliers.fa_b_ca1 = [6 90];
+outliers.fa_b_ca23 = [6 16 51 90];
+outliers.fa_b_sub = [6 13 90];
+outliers.fa_b_dg = [6 70 74 90];
 
-outliers.ad_b_ca1 = [54];
-outliers.ad_b_ca23 = [12 54];
-outliers.ad_b_sub = [54];
+outliers.ad_b_ca1 = [6 90];
+outliers.ad_b_ca23 = [6 90];
+outliers.ad_b_sub = [6 90];
+outliers.ad_b_dg = [6 90];
 
-outliers.rd_b_ca1 = [54];
-outliers.rd_b_ca23 = [54];
-outliers.rd_b_sub = [54];
+outliers.rd_b_ca1 = [6 90];
+outliers.rd_b_ca23 = [6 90];
+outliers.rd_b_sub = [6 90];
+outliers.rd_b_dg = [6 90];
 
-outliers.md_b_ca1 = [54];
-outliers.md_b_ca23 = [54];
-outliers.md_b_sub = [54];
+outliers.md_b_ca1 = [6 90];
+outliers.md_b_ca23 = [6 90];
+outliers.md_b_sub = [6 90];
+outliers.md_b_dg = [6 90];
 
-save('devti_remove_statoutliers.mat', 'outliers')
+% save('/Volumes/240/devti_devHPCsubfields/supportFiles/devti_remove_statoutliers.mat', 'outliers')
 
 
     

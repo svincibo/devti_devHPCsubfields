@@ -13,11 +13,11 @@ include = 'all'; % all, childrenonly
 % outlier = [];
 
 % Set working directories.
-rootDir = '/N/dc2/projects/lifebid/DevTI/devti_devHPCsubfields/';
+rootDir = '/Volumes/240/devti_devHPCsubfields/';
 % addpath(genpath(fullfile(rootDir, 'proj-5e5672430f7fa65e1d3c9621')));
 
 % Read in behavioral data.
-load(fullfile(rootDir, 'data.mat'))
+load(fullfile(rootDir, 'supportFiles/data.mat'))
 beh_data_in_tbl = array2table(data, 'VariableNames', {'subID', 'cov_age', 'iq', 'gp_age', 'a', 'b', 'c', 'd', 'e'});
 
 % Get contents of the directory where the tract measures for this subject are stored.

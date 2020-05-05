@@ -1,23 +1,34 @@
 clear all; close all; clc
 format shortG
 
-yc_color = [0 0.4470 0.7410];
-oc_color = [0.4660 0.6740 0.1880];
-a_color = [0.6350 0.0780 0.1840];
+yc_color = [0.6350 0.0780 0.1840]; %red
+oc_color = [0 0.4470 0.7410]; %blue
+a_color = [0.41176 0.41176 0.41176]; %gray
 
 blprojectid = '5e5672430f7fa65e1d3c9621';
+
+% Set working directories.
+rootDir = '/Volumes/240/devti_devHPCsubfields/';
+% addpath(genpath(fullfile(rootDir, 'proj-5e5672430f7fa65e1d3c9621')));
 
 remove_outliers = 'yes';
 include = 'all'; % all, childrenonly
 outlier = [90];
 
-% Set working directories.
-rootDir = '/N/dc2/projects/lifebid/DevTI/devti_devHPCsubfields/';
-% addpath(genpath(fullfile(rootDir, 'proj-5e5672430f7fa65e1d3c9621')));
+%%%%%%%%%%%%%%% TESTING AREA %%%%%%%%%%%%%%%%
+
+% % Use only the subjects that Meg used.
+% data_meg = readtable(fullfile(rootDir, 'supportFiles/dti_subfields_long.csv'));
+% sub_include = unique(data_meg.subnr);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Read in behavioral data.
-load(fullfile(rootDir, 'data.mat'))
-beh_data_in_tbl = array2table(data, 'VariableNames', {'subID', 'cov_age', 'iq', 'gp_age', 'a', 'b', 'c', 'd', 'e'});
+load(fullfile(rootDir, 'supportFiles/data.mat'))
+data_beh = array2table(data, 'VariableNames', {'subID', 'cov_age', 'iq', 'gp_age', 'a', 'b', 'c', 'd', 'e'});
+
+% Read in additional behavioral data, sex.
+data_sex = readtable(fullfile(rootDir, 'supportFiles/devti_sex_all.csv'));
 
 % Get contents of the directory where the tract measures for this subject are stored.
 grp_contents = dir(fullfile(rootDir, ['proj-' blprojectid]));
@@ -28,12 +39,12 @@ grp_contents = grp_contents(arrayfun(@(x) x.name(1), grp_contents) ~= '.');
 % Keep only names that are subject folders.
 grp_contents = grp_contents(arrayfun(@(x) x.name(1), grp_contents) == 's');
 
-% Load in each tract's tractography measures for this subject.
+% One subject at a time.
 sub_count = 0;
 for t = 1:size(grp_contents, 1)
            
-    % Only collect values for subjects that have both MRI and behaviora/demographic data.
-    if ~isempty(find((beh_data_in_tbl.subID == str2num(grp_contents(t).name(6:7)))))
+    % Only collect values for subjects that have both MRI and behavioral/demographic data.
+    if ~isempty(find((data_beh.subID == str2num(grp_contents(t).name(6:7))))) 
     
     % Display current sub ID.
     disp(grp_contents(t).name)
@@ -73,10 +84,10 @@ for t = 1:size(grp_contents, 1)
     subID(sub_count) = str2num(grp_contents(t).name(5:7));
     
     % Get age group.
-    group(sub_count) = beh_data_in_tbl.gp_age(find((beh_data_in_tbl.subID == str2num(grp_contents(t).name(6:7)))));
+    group(sub_count) = data_beh.gp_age(find((data_beh.subID == str2num(grp_contents(t).name(6:7)))));
     
     %     % Get age in months.
-    age(sub_count) = beh_data_in_tbl.cov_age(find((beh_data_in_tbl.subID == str2num(grp_contents(t).name(5:7)))));
+    age(sub_count) = data_beh.cov_age(find((data_beh.subID == str2num(grp_contents(t).name(5:7)))));
     
     clear data_snr_temp get_temp
     
@@ -124,13 +135,11 @@ disp(['r = ' num2str(rho(1, 2)) ', p = ' num2str(p(1, 2)) '.'])
 figure(1)
 plot(age(group==1)', meanmotion(group==1)', 'LineStyle', 'none', 'MarkerEdgeColor', yc_color, 'MarkerFaceColor', yc_color, 'Marker', 'o', 'MarkerSize', 10) % use all subjects for this
 hold on
-% r_yc = plotcorr(age(group==1)', snr(group==1)', [], [], [], 'c');
 plot(age(group==2)', meanmotion(group==2)', 'LineStyle', 'none', 'MarkerEdgeColor', oc_color, 'MarkerFaceColor', oc_color, 'Marker', 'o', 'MarkerSize', 10)
-% r_oc = plotcorr(age(group==2)', snr(group==2)', [], [], [], 'b');
-[rc, pc] = plotcorr(age(group~=3)', meanmotion(group~=3), [], [], [], 'k');
+% [rc, pc] = plotcorr(age(group~=3)', meanmotion(group~=3), [], [], [], 'k:');
 if strcmp(include, 'all')
-    plot(age(group==3)', meanmotion(group==3), 'r.', 'MarkerSize', 15)
-    r_a = plotcorr(age(group==3)', meanmotion(group==3), [], [], [], 'r');
+    plot(age(group==3)', meanmotion(group==3), 'LineStyle', 'none', 'MarkerEdgeColor', a_color, 'MarkerFaceColor', a_color, 'Marker', 'o', 'MarkerSize', 10)
+%     r_a = plotcorr(age(group==3)', meanmotion(group==3), [], [], [], 'k:');
     r_all = plotcorr(age', meanmotion, [], [], [], 'k');
     xlim_lo = min(age)-1;
     xlim_hi = max(age)+1;
@@ -146,14 +155,13 @@ end
 legend('boxoff');
 legend('off');
 
-
 xlabel('Age (years)')
-title('Correlations between Age and FD')
+% title('Correlations between Age and FD')
 
 capsize = 0;
 marker = 'o';
-markeredgecolor_h = [0 .73 .73]'; markeredgecolor_v = [.146 0 0]';
-markerfacecolor_h = [0 .73 .73]; markerfacecolor_v = [.146 0 0];
+% markeredgecolor_h = [0 .73 .73]'; markeredgecolor_v = [.146 0 0]';
+% markerfacecolor_h = [0 .73 .73]; markerfacecolor_v = [.146 0 0];
 linewidth = 1.5;
 linestyle = 'none';
 markersize = 10;
@@ -167,11 +175,11 @@ alphablend = .8;
 
 % xaxis
 xax = get(gca, 'xaxis');
-xax.Limits = [xlim_lo xlim_hi];
-xax.TickValues = [xlim_lo xlim_hi];
+xax.Limits = [0 30];
+xax.TickValues = [0 5 10 15 20 25 30];
 xax.TickDirection = 'out';
 xax.TickLength = [xticklength xticklength];
-xlabels = {num2str(xlim_lo, '%1.2f'), '', num2str(xlim_hi, '%1.2f')};
+xlabels = {'0', '5', '10', '15', '20', '25', '30'};
 %     xlabels = cellfun(@(x) strrep(x, ',', '\newline'), xlabels, 'UniformOutput', false);
 xax.TickLabels = xlabels;
 xax.FontName = fontname;
@@ -179,12 +187,12 @@ xax.FontSize = fontsize;
 xax.FontAngle = fontangle;
 
 % yaxis
-ylim_lo = 0; ylim_hi = 4;
+ylim_lo = 0; ylim_hi = 1;
 yax = get(gca,'yaxis');
 yax.Limits = [ylim_lo ylim_hi];
 yax.TickValues = [ylim_lo (ylim_lo+ylim_hi)/2 ylim_hi];
 yax.TickDirection = 'out';
-yax.TickLength = [yticklength yticklength];
+yax.TickLength = [xticklength xticklength];
 yax.TickLabels = {num2str(ylim_lo, '%1.0f'), '', num2str(ylim_hi, '%1.0f')};
 yax.FontName = fontname;
 yax.FontSize = fontsize;
@@ -216,8 +224,8 @@ plot([3 3], [nanmean(meanmotion(group == 3)) - nanstd(meanmotion(group == 3)) na
 
 xlim_lo = min(age)-1;
 xlim_hi = max(age)+1;
-ylim_lo = min(meanmotion)-1;
-ylim_hi = max(meanmotion)+1;
+% ylim_lo = min(meanmotion)-1;
+% ylim_hi = max(meanmotion)+1;
     
 % xaxis
 xax = get(gca, 'xaxis');
@@ -260,5 +268,6 @@ hold off;
 % Manually record outliers. Include observations with unusually high FD and any above 2mm. 
 % (0 indicates no outliers)
 outliers.motion = 90;
+% outliers.motion = subID(meanmotion>2);
 
 save('devti_remove_motionoutliers.mat', 'outliers')

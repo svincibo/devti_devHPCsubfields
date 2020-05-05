@@ -4,17 +4,19 @@
 clear all; close all; clc
 format long g
 
-blprojectid = '5e5672430f7fa65e1d3c9621';
+blprojectid = 'proj-5e5672430f7fa65e1d3c9621/act';
+% For fsldtifit measurements use: proj-5e5672430f7fa65e1d3c9621
+% For mrtrix3 act measurements use: proj-5e5672430f7fa65e1d3c9621/act
 
 % Select WM measure.
-wm = {'fa', 'ad', 'rd', 'md'};
+wm = {'fa', 'md'};
 
 % Set working directories.
-rootDir = '/N/dc2/projects/lifebid/DevTI/devti_devHPCsubfields';
+rootDir = '/Volumes/240/devti_devHPCsubfields';
 %rng default % for reproducibility
 
 % Get age.
-load('data.mat')
+load(fullfile(rootDir, 'supportFiles/data.mat'))
 subs = array2table(data, 'VariableNames', {'subID', 'cov_age', 'iq', 'gp_age', 'a', 'b', 'c', 'd', 'e'});
 
 % Add fix so to account for leading zeros in file names.
@@ -35,7 +37,7 @@ end
 %% ROI.
 
 % Get contents of the directory where the tract measures for this subject are stored.
-grp_contents = dir(fullfile(rootDir, ['/proj-' blprojectid '/']));
+grp_contents = dir(fullfile(rootDir, blprojectid));
 
 % Remove the '.' and '..' files.
 grp_contents = grp_contents(arrayfun(@(x) x.name(1), grp_contents) ~= '.');
@@ -100,7 +102,7 @@ for w = 1:size(wm, 2)
         
     end % end i
     
-    save(['devti_data_' wm{w} '.mat'], 'sub', 'age', 'sex', 'iq', 'roi', 'm')
+    save(fullfile(rootDir, ['supportFiles/devti_data_' wm{w} '_mrtrix3act.mat']), 'sub', 'age', 'sex', 'iq', 'roi', 'm')
     
     clear sub age roi m
     
