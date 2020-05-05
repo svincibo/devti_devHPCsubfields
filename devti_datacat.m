@@ -87,6 +87,9 @@ for w = 1:size(wm, 2)
                 % Grab age.
                 age(sub_count) = subs.cov_age(subs.subID == sub(sub_count));
                 
+                % Get age group.
+                group(sub_count) = subs.gp_age(subs.subID == sub(sub_count));
+                
                 % Grab sex. 1 = F, 2 = M
                 %sex(sub_count) = subs.cov_sex(subs.subID == sub(sub_count));
                 sex(sub_count) = randi([1 2]); %temporary until I find the data for this
@@ -102,9 +105,9 @@ for w = 1:size(wm, 2)
         
     end % end i
     
-    save(fullfile(rootDir, ['supportFiles/devti_data_' wm{w} '_mrtrix3act.mat']), 'sub', 'age', 'sex', 'iq', 'roi', 'm')
+    save(fullfile(rootDir, ['supportFiles/devti_data_' wm{w} '_mrtrix3act.mat']), 'sub', 'age', 'group', 'sex', 'iq', 'roi', 'm')
     
-    clear sub age roi m
+    clear sub age roi m group
     
 end % end w
 

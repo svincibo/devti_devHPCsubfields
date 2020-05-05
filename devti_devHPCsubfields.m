@@ -28,6 +28,7 @@ subregion = {'b_ca1', 'b_ca23', 'b_dg', 'b_sub'};
 % Load removals: statistical outliers. (note motion outlier, sub90, is
 % included in statoutliers)
 load(fullfile(rootDir, 'supportFiles/devti_remove_statoutliers.mat'))
+
 %
 % % Load removals: motion.
 % load('devti_remove_motionoutliers.mat')
@@ -53,8 +54,8 @@ for w = 2%1:length(wm)
     m_demeaned = double(m - nanmean(m, 1));
     
     % Convert data to table for easier model specification.
-    data = array2table(cat(2, transpose(sub), transpose(age), transpose(sex), transpose(iq), m_demeaned), 'VariableNames', {'subID', 'age', 'sex',  'iq', roi{1, :}});
-    data_raw = array2table(cat(2, transpose(sub), transpose(age), transpose(sex), transpose(iq), m), 'VariableNames', {'subID', 'age', 'sex',  'iq', roi{1, :}});
+    data = array2table(cat(2, transpose(sub), transpose(age), transpose(group), transpose(sex), transpose(iq), m_demeaned), 'VariableNames', {'subID', 'age', 'group', 'sex',  'iq', roi{1, :}});
+    data_raw = array2table(cat(2, transpose(sub), transpose(age), transpose(group), transpose(sex), transpose(iq), m), 'VariableNames', {'subID', 'age', 'group', 'sex',  'iq', roi{1, :}});
     
     % One subfield at a time.
     for r = 1:length(subregion)
@@ -325,21 +326,21 @@ for w = 2%1:length(wm)
     
 end
 
-%% Perform an ANOVA for subfield.
+%% Perform an ANOVA for subfield: DV is wm measurement, Factor 1 is subfield: b_ca1, b_ca23, b_dg, b_sub, Factor 2 is age group: child, adolescent, adult
 
 % Transform into long form for glm using demeaned measurements.
-data_prefix = table2array(data(:, 1:4));
+data_prefix = table2array(data(:, 1:5));
 
-b_ca1 = table2array(data(:, 5));
+b_ca1 = table2array(data(:, 6));
 b_ca1_idx = repmat(1, size(b_ca1));
 
-b_ca23 = table2array(data(:, 6));
+b_ca23 = table2array(data(:, 7));
 b_ca23_idx = repmat(2, size(b_ca23));
 
-b_dg = table2array(data(:, 7));
+b_dg = table2array(data(:, 8));
 b_dg_idx = repmat(3, size(b_dg));
 
-b_sub = table2array(data(:, 8));
+b_sub = table2array(data(:, 9));
 b_sub_idx = repmat(4, size(b_sub));
 
 wm_measure = cat(1, b_ca1, b_ca23, b_dg, b_sub);
@@ -347,9 +348,9 @@ wm_measure_idx = cat(1, b_ca1_idx, b_ca23_idx, b_dg_idx, b_sub_idx);
 data_prefix_new = repmat(data_prefix, [4 1]);
 
 d_array = cat(2, data_prefix_new, wm_measure_idx, wm_measure);
-d = array2table(d_array, 'VariableNames', {'subID', 'age', 'sex',  'iq', 'subfield', 'measurement'});
+d = array2table(d_array, 'VariableNames', {'subID', 'age', 'group', 'sex',  'iq', 'subfield', 'measurement'});
 
-modelspec = 'measurement ~ sex + subfield*age';
+modelspec = 'measurement ~ sex + subfield*group';
 
 % Get outliers -- NOTE: for now this is any subject that was an outlier on any measure in any subfield.
 remove = sum(d.subID == unique(struct2array(outliers)), 2) >= 1;
@@ -358,6 +359,8 @@ keep = sum(d.subID ~= unique(struct2array(outliers)), 2) >= 1;
 % Fit regression model, excluding outliers.
 mdlr = fitlm(d, modelspec, 'Exclude', remove);
  
+disp(wm{w})
+
 % Check for significant predictors.
 mdlr.anova
 
