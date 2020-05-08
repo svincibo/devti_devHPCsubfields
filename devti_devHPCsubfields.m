@@ -57,6 +57,11 @@ for w = 2%1:length(wm)
     data = array2table(cat(2, transpose(sub), transpose(age), transpose(group), transpose(sex), transpose(iq), m_demeaned), 'VariableNames', {'subID', 'age', 'group', 'sex',  'iq', roi{1, :}});
     data_raw = array2table(cat(2, transpose(sub), transpose(age), transpose(group), transpose(sex), transpose(iq), m), 'VariableNames', {'subID', 'age', 'group', 'sex',  'iq', roi{1, :}});
     
+    % Create columns for hippocampal head by averaging across all hippocampal subfields within the head.
+    data.b_head = nanmean([data.b_ca1 data.b_ca23 data.b_dg data.b_sub], 2);
+    data.l_head = nanmean([data.l_ca1 data.l_ca23 data.l_dg data.l_sub], 2);
+    data.r_head = nanmean([data.r_ca1 data.r_ca23 data.r_dg data.r_sub], 2);
+    
     % One subfield at a time.
     for r = 1:length(subregion)
         
@@ -98,6 +103,7 @@ for w = 2%1:length(wm)
         
         % Get AIC value corrected for sample size: AICc.
         disp(['AICc for ' wm{w} ' in ' subregion{r} ' using a model including linear main effects is ' num2str(aicc) '.']);
+        disp(['R-squared for ' wm{w} ' in ' subregion{r} ' using a model including linear main effects is ' num2str(mdlr.Rsquared.Ordinary) '.']);
         
         mdlr.anova
         clear mdlr
@@ -121,6 +127,7 @@ for w = 2%1:length(wm)
         
         % Get AIC value corrected for sample size: AICc.
         disp(['AICc for ' wm{w} ' in ' subregion{r} ' using a model including nonlinear main effects is ' num2str(aicc) '.']);
+        disp(['R-squared for ' wm{w} ' in ' subregion{r} ' using a model including nonlinear main effects is ' num2str(mdlr.Rsquared.Ordinary) '.']);
         
         mdlr.anova
         clear mdlr
@@ -144,6 +151,7 @@ for w = 2%1:length(wm)
         
         % Get AIC value corrected for sample size: AICc.
         disp(['AICc for ' wm{w} ' in ' subregion{r} ' using a model including linear interactions is ' num2str(aicc) '.']);
+        disp(['R-squared for ' wm{w} ' in ' subregion{r} ' using a model including linear interactions is ' num2str(mdlr_lim.Rsquared.Ordinary) '.']);
         
         mdlr_lim.anova
         
@@ -166,12 +174,13 @@ for w = 2%1:length(wm)
         
         % Get AIC value corrected for sample size: AICc.
         disp(['AICc for ' wm{w} ' in ' subregion{r} ' using a model including nonlinear interactions is ' num2str(aicc) '.']);
+        disp(['R-squared for ' wm{w} ' in ' subregion{r} ' using a model including nonlinear interactions is ' num2str(mdlr_nlim.Rsquared.Ordinary) '.']);
         
         mdlr_nlim.anova
         
         %% Visualize.
         
-                %     % Subselect for testing: uncomment this when using only Meg's data points.
+        %     % Subselect for testing: uncomment this when using only Meg's data points.
         %     if exist('sub_include')
         %         keep_idx = ismember(sub', sub_include);
         %     else
@@ -197,38 +206,89 @@ for w = 2%1:length(wm)
             
             degp = 1;
             
+            modelspec1 = [subregion{r} ' ~ sex + (1|subID)'];
+            modelspec2 = 'res ~ age';
+            
+            if sum(remove) == 0
+                
+                % Get and remove residuals.
+                mdlr = fitlme(data, modelspec1);
+                data.res = table2array(mdlr.Residuals(:, 1));
+                
+                % Fit regression model.
+                mdlr_lim = fitlme(data, modelspec2);
+                
+            else
+                
+                data = data(keep_idx, :);
+                
+                % Get and remove residuals.
+                mdlr = fitlme(data, modelspec1);
+                data.res = table2array(mdlr.Residuals(:, 1));
+                
+                % Fit regression model, excluding outliers.
+                mdlr_lim = fitlme(data, modelspec2);
+                
+            end
+            
             % Select y-data: ".. adjusted y-data were calculated by adding the residual
             % to the fitted value for each point." Figure 2 in Schlichting et al., JoCN, 2018.
             % I used the "raw residuals", i.e., column 1.
-            y = mdlr_lim.Fitted(keep_idx) + table2array(mdlr_lim.Residuals(keep_idx, 1));
+            y = mdlr_lim.Fitted + table2array(mdlr_lim.Residuals(:, 1));
             
         elseif strcmp(wm{w}, 'md')
             
             degp = 2;
             
+            modelspec1 = [subregion{r} ' ~ sex*age + (1|subID)'];
+            modelspec2 = 'res ~ sex*(age^2)';
+            
+            if sum(remove) == 0
+                
+                % Get and remove residuals.
+                mdlr = fitlme(data, modelspec1);
+                data.res = table2array(mdlr.Residuals(:, 1));
+                
+                % Fit regression model.
+                mdlr_lim = fitlme(data, modelspec2);
+                
+            else
+                
+                data = data(keep_idx, :);
+                
+                % Get and remove residuals.
+                mdlr = fitlme(data, modelspec1);
+                data.res = table2array(mdlr.Residuals(:, 1));
+                
+                % Fit regression model, excluding outliers.
+                mdlr_lim = fitlme(data, modelspec2);
+                
+            end
+            
             % Select y-data: ".. adjusted y-data were calculated by adding the residual
             % to the fitted value for each point." Figure 2 in Schlichting et al., JoCN, 2018.
             % I used the "raw residuals", i.e., column 1.
-            y = mdlr_nlim.Fitted(keep_idx) + table2array(mdlr_nlim.Residuals(keep_idx, 1));
+            y = mdlr_lim.Fitted + table2array(mdlr_lim.Residuals(:, 1));
             
         else
             
             degp = 1;
             
         end
-                 
-%         % Un-demean for visualization.
-%         y = y + double(m - nanmean(m, 1));
         
-        % Set the color for this roi.
+        % Set the color for this roi and add back in mean.
         if strcmp(subregion{r}, 'b_ca1')
             clr = [0 0.4470 0.7410]; % blue
+%             y = y + nanmean(data_raw.b_ca1);
         elseif strcmp(subregion{r}, 'b_ca23')
             clr = [0.4940 0.1840 0.5560]; % purple
+%             y = y + nanmean(data_raw.b_ca23);
         elseif strcmp(subregion{r}, 'b_dg')
             clr = [0.5019 0.5019 0.5019]; % gray
+%             y = y + nanmean(data_raw.b_dg);
         elseif strcmp(subregion{r}, 'b_sub')
             clr = [0.8500 0.3250 0.0980]; % orange
+%             y = y + nanmean(data_raw.b_sub);
         end
         
         if r == 1
@@ -247,14 +307,15 @@ for w = 2%1:length(wm)
         f1 = polyval(c1,x1);
         plot(x1, f1, 'LineWidth', 3, 'LineStyle', '-', 'Color', clr)
         hi = f1 + std(f1, 0, 2); lo = f1 - std(f1, 0, 2); x2 = (1:size(f1, 2))'.*.30;
-        hp3 = patch([x2; x2(end:-1:1); x2(1)], [lo'; hi(end:-1:1)'; lo(1)], clr(1:3));
-        set(hp3, 'facecolor', clr(1:3), 'edgecolor', 'none', 'facealpha', .2);
+        hp3 = patch([x2; x2(end:-1:1); x2(1)], [lo'; hi(end:-1:1)'; lo(1)], clr);
+        set(hp3, 'facecolor', clr, 'edgecolor', 'none', 'facealpha', .2);
         
         disp([subregion{r} ' = ' num2str(c1)])
         
     end
     
-    legend([{'CA1, F'}, {'CA1, M'}, {''}, {''}, {'CA23, F'}, {'CA23, M'}, {''}, {''}, {'dg, M'}, {'dg, F'}, {''}, {''}, {'SUB, M'}, {'SUB, F'}, {''}, {''}], 'Location', 'bestoutside')
+    legend([{'CA1, F'}, {'CA1, M'}, {''}, {''}, {'CA23, F'}, {'CA23, M'}, {''}, {''}, ...
+        {'dg, M'}, {'dg, F'}, {''}, {''}, {'SUB, M'}, {'SUB, F'}, {''}, {''}], 'Location', 'bestoutside')
     legend box off
     
     if strcmp(wm{w}, 'fa')
@@ -263,31 +324,21 @@ for w = 2%1:length(wm)
         ylim_lo = -0.1; ylim_hi = 0.1;
         %         ylim_lo = -01; ylim_hi = -0.4; % for log transform
         
-    elseif strcmp(wm{w}, 'ad')
-        
-        ylab = {'Axial Diffusivity, (demeaned, adjusted, AD x 1e-3)'};
-        ylim_lo = 0.5; ylim_hi = 1.5;
-        
-    elseif strcmp(wm{w}, 'rd')
-        
-        ylab = {'Radial Diffusivity, (demeaned, adjusted, RD x 1e-3)'};
-        ylim_lo = 0.5; ylim_hi = 1;
-        
     elseif strcmp(wm{w}, 'md')
         
         ylab = {'Mean Diffusivity, (demeaned, adjusted, MD x 1e-3)'};
-        ylim_lo = -0.4; ylim_hi = 0.4;
+        ylim_lo = -0.2; ylim_hi = 0.2;
         %         ylim_lo = -0.2; ylim_hi = 0.2; % for log transform
         
     end
     
     % xaxis
     xax = get(gca, 'xaxis');
-    xax.Limits = [0 30];
-    xax.TickValues = [0 5 10 15 20 25 30];
+    xax.Limits = [5 30];
+    xax.TickValues = [5 10 15 20 25 30];
     xax.TickDirection = 'out';
     xax.TickLength = [yticklength yticklength];
-    xlabels = {'0', '5', '10', '15', '20', '25', '30'};
+    xlabels = {'5', '10', '15', '20', '25', '30'};
     xlabels = cellfun(@(x) strrep(x, ',', '\newline'), xlabels, 'UniformOutput', false);
     xax.TickLabels = xlabels;
     xax.FontName = fontname;
@@ -317,50 +368,50 @@ for w = 2%1:length(wm)
     
     pbaspect([1 1 1])
     
-    print(fullfile(rootDir, 'plots', ['plot_linearfit_bygroup_'  wm{w}]), '-dpng')
-    print(fullfile(rootDir, 'plots', 'eps', ['plot_linearfit_bygroup_' wm{w}]), '-depsc')
+    print(fullfile(rootDir, 'plots', ['plot_linearfit_subfield_bygroup_'  wm{w}]), '-dpng')
+    print(fullfile(rootDir, 'plots', 'eps', ['plot_linearfit_subfield_bygroup_' wm{w}]), '-depsc')
     
     hold off;
     
     clear m roi sub x y f1 hp3
     
+    %% Perform a Two-way ANOVA for subfield: DV is wm measurement, Factor 1 is subfield: b_ca1, b_ca23, b_dg, b_sub, Factor 2 is age group: child, adolescent, adult
+    
+    % Transform into long form for glm using demeaned measurements.
+    data_prefix = table2array(data(:, 1:5));
+    
+    b_ca1 = data.b_ca1;
+    b_ca1_idx = repmat(1, size(b_ca1));
+    
+    b_ca23 = data.b_ca23;
+    b_ca23_idx = repmat(2, size(b_ca23));
+    
+    b_dg = data.b_dg;
+    b_dg_idx = repmat(3, size(b_dg));
+    
+    b_sub = data.b_sub;
+    b_sub_idx = repmat(4, size(b_sub));
+    
+    wm_measure = cat(1, b_ca1, b_ca23, b_dg, b_sub);
+    wm_measure_idx = cat(1, b_ca1_idx, b_ca23_idx, b_dg_idx, b_sub_idx);
+    data_prefix_new = repmat(data_prefix, [4 1]);
+    
+    d_array = cat(2, data_prefix_new, wm_measure_idx, wm_measure);
+    d = array2table(d_array, 'VariableNames', {'subID', 'age', 'group', 'sex',  'iq', 'subfield', 'measurement'});
+    
+    modelspec = 'measurement ~ sex + subfield*group';
+    
+    % Get outliers -- NOTE: for now this is any subject that was an outlier on any measure in any subfield.
+    remove = sum(d.subID == unique(struct2array(outliers)), 2) >= 1;
+    keep = sum(d.subID ~= unique(struct2array(outliers)), 2) >= 1;
+    
+    % Fit regression model, excluding outliers.
+    mdlr = fitlm(d, modelspec, 'Exclude', remove);
+    
+    disp(wm{w})
+    
+    % Check for significant predictors.
+    mdlr.anova
+    
 end
-
-%% Perform an ANOVA for subfield: DV is wm measurement, Factor 1 is subfield: b_ca1, b_ca23, b_dg, b_sub, Factor 2 is age group: child, adolescent, adult
-
-% Transform into long form for glm using demeaned measurements.
-data_prefix = table2array(data(:, 1:5));
-
-b_ca1 = table2array(data(:, 6));
-b_ca1_idx = repmat(1, size(b_ca1));
-
-b_ca23 = table2array(data(:, 7));
-b_ca23_idx = repmat(2, size(b_ca23));
-
-b_dg = table2array(data(:, 8));
-b_dg_idx = repmat(3, size(b_dg));
-
-b_sub = table2array(data(:, 9));
-b_sub_idx = repmat(4, size(b_sub));
-
-wm_measure = cat(1, b_ca1, b_ca23, b_dg, b_sub);
-wm_measure_idx = cat(1, b_ca1_idx, b_ca23_idx, b_dg_idx, b_sub_idx);
-data_prefix_new = repmat(data_prefix, [4 1]);
-
-d_array = cat(2, data_prefix_new, wm_measure_idx, wm_measure);
-d = array2table(d_array, 'VariableNames', {'subID', 'age', 'group', 'sex',  'iq', 'subfield', 'measurement'});
-
-modelspec = 'measurement ~ sex + subfield*group';
-
-% Get outliers -- NOTE: for now this is any subject that was an outlier on any measure in any subfield.
-remove = sum(d.subID == unique(struct2array(outliers)), 2) >= 1;
-keep = sum(d.subID ~= unique(struct2array(outliers)), 2) >= 1;
-
-% Fit regression model, excluding outliers.
-mdlr = fitlm(d, modelspec, 'Exclude', remove);
- 
-disp(wm{w})
-
-% Check for significant predictors.
-mdlr.anova
 
