@@ -38,7 +38,7 @@ load(fullfile(rootDir, 'supportFiles/devti_remove_statoutliers.mat'))
 % % Note: no datasets were removed due to unusually low snr
 
 % One microstructural measurement at a time.
-for w = 2%1:length(wm)
+for w = 1:length(wm)
     
     load(fullfile(rootDir, ['supportFiles/devti_data_' wm{w} '_mrtrix3act.mat']))
     
@@ -204,10 +204,10 @@ for w = 2%1:length(wm)
         % while non-linear interactions model is best for MD.
         if strcmp(wm{w}, 'fa')
             
-            degp = 1;
+            degp = 2;
             
-            modelspec1 = [subregion{r} ' ~ sex + (1|subID)'];
-            modelspec2 = 'res ~ age';
+            modelspec1 = [subregion{r} ' ~ sex*age + (1|subID)'];
+            modelspec2 = 'res ~ sex*(age)^2';
             
             if sum(remove) == 0
                 
@@ -238,10 +238,10 @@ for w = 2%1:length(wm)
             
         elseif strcmp(wm{w}, 'md')
             
-            degp = 2;
+            degp = 1;
             
-            modelspec1 = [subregion{r} ' ~ sex*age + (1|subID)'];
-            modelspec2 = 'res ~ sex*(age^2)';
+            modelspec1 = [subregion{r} ' ~ sex + (1|subID)'];
+            modelspec2 = 'res ~ age';
             
             if sum(remove) == 0
                 
@@ -412,6 +412,8 @@ for w = 2%1:length(wm)
     
     % Check for significant predictors.
     mdlr.anova
+    
+    clear data data_raw m_demeaned m
     
 end
 

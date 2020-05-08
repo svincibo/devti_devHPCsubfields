@@ -223,10 +223,10 @@ for w = 1:length(wm)
         
     elseif strcmp(wm{w}, 'md')
         
-        degp = 2;
+        degp = 1;
         
-        modelspec1 = 'b_head ~ sex*age + (1|subID)';
-        modelspec2 = 'res ~ sex*(age^2)';
+        modelspec1 = 'b_head ~ sex + (1|subID)';
+        modelspec2 = 'res ~ age';
 
         if sum(remove) == 0
             
