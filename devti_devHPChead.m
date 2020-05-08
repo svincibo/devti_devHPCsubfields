@@ -88,7 +88,7 @@ for w = 1:length(wm)
     
     % Get AIC value corrected for sample size: AICc.
     disp(['AICc for ' wm{w} ' in hippocampal head using a model including linear main effects is ' num2str(aicc) '.']);
-    disp(['R-squared for ' wm{w} ' in hippocampal head using a model including linear main effects is ' num2str(mdlr.Rsquared.Ordinary) '.']);
+    disp(['Adjusted R-squared for ' wm{w} ' in hippocampal head using a model including linear main effects is ' num2str(mdlr.Rsquared.Adjusted) '.']);
 
     mdlr.anova
     clear mdlr
@@ -112,7 +112,7 @@ for w = 1:length(wm)
     
     % Get AIC value corrected for sample size: AICc.
     disp(['AICc for ' wm{w} ' in hippocampal head using a model including nonlinear main effects is ' num2str(aicc) '.']);
-    disp(['R-squared for ' wm{w} ' in hippocampal head using a model including nonlinear main effects is ' num2str(mdlr.Rsquared.Ordinary) '.']);
+    disp(['Adjusted R-squared for ' wm{w} ' in hippocampal head using a model including nonlinear main effects is ' num2str(mdlr.Rsquared.Adjusted) '.']);
 
     mdlr.anova
     clear mdlr
@@ -136,7 +136,7 @@ for w = 1:length(wm)
     
     % Get AIC value corrected for sample size: AICc.
     disp(['AICc for ' wm{w} ' in hippocampal head using a model including linear interactions is ' num2str(aicc) '.']);
-    disp(['R-squared for ' wm{w} ' in hippocampal head using a model including linear interactions is ' num2str(mdlr_lim.Rsquared.Ordinary) '.']);
+    disp(['Adjusted R-squared for ' wm{w} ' in hippocampal head using a model including linear interactions is ' num2str(mdlr_lim.Rsquared.Adjusted) '.']);
 
     mdlr_lim.anova
     
@@ -159,7 +159,7 @@ for w = 1:length(wm)
     
     % Get AIC value corrected for sample size: AICc.
     disp(['AICc for ' wm{w} ' in hippocampal head using a model including nonlinear interactions is ' num2str(aicc) '.']);
-    disp(['R-squared for ' wm{w} ' in hippocampal head using a model including nonlinear interactions is ' num2str(mdlr_nlim.Rsquared.Ordinary) '.']);
+    disp(['Adjusted R-squared for ' wm{w} ' in hippocampal head using a model including nonlinear interactions is ' num2str(mdlr_nlim.Rsquared.Adjusted) '.']);
 
     mdlr_nlim.anova
     
