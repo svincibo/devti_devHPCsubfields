@@ -156,7 +156,7 @@ for w = 1:length(wm)
         mdlr_lim.anova
         
         % 4. Nonlinear interactions model.
-        modelspec = [subregion{r} ' ~ sex*age + sex*(age^2) + (1|subID)'];
+        modelspec = [subregion{r} ' ~ sex*(age^2) + (1|subID)'];
         if sum(remove) == 0
             
             % Fit regression model.
@@ -206,8 +206,8 @@ for w = 1:length(wm)
             
             degp = 2;
             
-            modelspec1 = [subregion{r} ' ~ sex*age + (1|subID)'];
-            modelspec2 = 'res ~ sex*(age)^2';
+            modelspec1 = [subregion{r} ' ~ sex + (1|subID)'];
+            modelspec2 = 'res ~ (age)^2';
             
             if sum(remove) == 0
                 
@@ -321,13 +321,13 @@ for w = 1:length(wm)
     if strcmp(wm{w}, 'fa')
         
         ylab = 'Fractional Anisotropy, demeaned, adjusted';
-        ylim_lo = -0.1; ylim_hi = 0.1;
+        ylim_lo = -0.07; ylim_hi = 0.07;
         %         ylim_lo = -01; ylim_hi = -0.4; % for log transform
         
     elseif strcmp(wm{w}, 'md')
         
         ylab = {'Mean Diffusivity, (demeaned, adjusted, MD x 1e-3)'};
-        ylim_lo = -0.2; ylim_hi = 0.2;
+        ylim_lo = -0.1; ylim_hi = 0.1;
         %         ylim_lo = -0.2; ylim_hi = 0.2; % for log transform
         
     end
@@ -351,7 +351,7 @@ for w = 1:length(wm)
     yax.TickValues = [ylim_lo (ylim_lo+ylim_hi)/2 ylim_hi];
     yax.TickDirection = 'out';
     yax.TickLength = [xticklength xticklength];
-    yax.TickLabels = {num2str(ylim_lo, '%1.1f'), num2str((ylim_lo+ylim_hi)/2, '%1.0f'), num2str(ylim_hi, '%1.1f')};
+    yax.TickLabels = {num2str(ylim_lo, '%1.2f'), num2str((ylim_lo+ylim_hi)/2, '%1.0f'), num2str(ylim_hi, '%1.2f')};
     yax.FontName = fontname;
     yax.FontSize = fontsize;
     

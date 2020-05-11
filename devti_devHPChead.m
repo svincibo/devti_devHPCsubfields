@@ -89,7 +89,7 @@ for w = 1:length(wm)
     % Get AIC value corrected for sample size: AICc.
     disp(['AICc for ' wm{w} ' in hippocampal head using a model including linear main effects is ' num2str(aicc) '.']);
     disp(['Adjusted R-squared for ' wm{w} ' in hippocampal head using a model including linear main effects is ' num2str(mdlr.Rsquared.Adjusted) '.']);
-
+    
     mdlr.anova
     clear mdlr
     
@@ -113,7 +113,7 @@ for w = 1:length(wm)
     % Get AIC value corrected for sample size: AICc.
     disp(['AICc for ' wm{w} ' in hippocampal head using a model including nonlinear main effects is ' num2str(aicc) '.']);
     disp(['Adjusted R-squared for ' wm{w} ' in hippocampal head using a model including nonlinear main effects is ' num2str(mdlr.Rsquared.Adjusted) '.']);
-
+    
     mdlr.anova
     clear mdlr
     
@@ -137,11 +137,11 @@ for w = 1:length(wm)
     % Get AIC value corrected for sample size: AICc.
     disp(['AICc for ' wm{w} ' in hippocampal head using a model including linear interactions is ' num2str(aicc) '.']);
     disp(['Adjusted R-squared for ' wm{w} ' in hippocampal head using a model including linear interactions is ' num2str(mdlr_lim.Rsquared.Adjusted) '.']);
-
+    
     mdlr_lim.anova
     
     % 4. Nonlinear interactions model.
-    modelspec = 'b_head ~ sex*age + sex*(age^2) + (1|subID)';
+    modelspec = 'b_head ~ sex*(age^2) + (1|subID)';
     if sum(remove) == 0
         
         % Fit regression model.
@@ -160,7 +160,7 @@ for w = 1:length(wm)
     % Get AIC value corrected for sample size: AICc.
     disp(['AICc for ' wm{w} ' in hippocampal head using a model including nonlinear interactions is ' num2str(aicc) '.']);
     disp(['Adjusted R-squared for ' wm{w} ' in hippocampal head using a model including nonlinear interactions is ' num2str(mdlr_nlim.Rsquared.Adjusted) '.']);
-
+    
     mdlr_nlim.anova
     
     %% Visualize.
@@ -191,9 +191,9 @@ for w = 1:length(wm)
         
         degp = 2;
         
-                modelspec1 = 'b_head ~ sex + age + (1|subID)';
-                modelspec2 = 'res ~ sex*age';
-
+        modelspec1 = 'b_head ~ sex + age + (1|subID)';
+        modelspec2 = 'res ~ age^2';
+        
         if sum(remove) == 0
             
             % Get and remove residuals.
@@ -202,7 +202,7 @@ for w = 1:length(wm)
             
             % Fit regression model.
             mdlr_lim = fitlme(data, modelspec2);
-
+            
         else
             
             data = data(keep_idx, :);
@@ -210,10 +210,10 @@ for w = 1:length(wm)
             % Get and remove residuals.
             mdlr = fitlme(data, modelspec1);
             data.res = table2array(mdlr.Residuals(:, 1));
-
+            
             % Fit regression model, excluding outliers.
             mdlr_lim = fitlme(data, modelspec2);
-
+            
         end
         
         % Select y-data: ".. adjusted y-data were calculated by adding the residual
@@ -227,7 +227,7 @@ for w = 1:length(wm)
         
         modelspec1 = 'b_head ~ sex + (1|subID)';
         modelspec2 = 'res ~ age';
-
+        
         if sum(remove) == 0
             
             % Get and remove residuals.
@@ -236,7 +236,7 @@ for w = 1:length(wm)
             
             % Fit regression model.
             mdlr_lim = fitlme(data, modelspec2);
-
+            
         else
             
             data = data(keep_idx, :);
@@ -244,10 +244,10 @@ for w = 1:length(wm)
             % Get and remove residuals.
             mdlr = fitlme(data, modelspec1);
             data.res = table2array(mdlr.Residuals(:, 1));
-
+            
             % Fit regression model, excluding outliers.
             mdlr_lim = fitlme(data, modelspec2);
-
+            
         end
         
         % Select y-data: ".. adjusted y-data were calculated by adding the residual
@@ -293,13 +293,13 @@ for w = 1:length(wm)
     if strcmp(wm{w}, 'fa')
         
         ylab = 'Fractional Anisotropy, demeaned, adjusted';
-        ylim_lo = -0.1; ylim_hi = 0.1;
+        ylim_lo = -0.05; ylim_hi = 0.05;
         %         ylim_lo = -01; ylim_hi = -0.4; % for log transform
         
     elseif strcmp(wm{w}, 'md')
         
         ylab = {'Mean Diffusivity, (demeaned, adjusted, MD x 1e-3)'};
-        ylim_lo = -0.2; ylim_hi = 0.2;
+        ylim_lo = -0.1; ylim_hi = 0.1;
         %         ylim_lo = -0.2; ylim_hi = 0.2; % for log transform
         
     end
@@ -323,7 +323,7 @@ for w = 1:length(wm)
     yax.TickValues = [ylim_lo (ylim_lo+ylim_hi)/2 ylim_hi];
     yax.TickDirection = 'out';
     yax.TickLength = [xticklength xticklength];
-    yax.TickLabels = {num2str(ylim_lo, '%1.1f'), num2str((ylim_lo+ylim_hi)/2, '%1.0f'), num2str(ylim_hi, '%1.1f')};
+    yax.TickLabels = {num2str(ylim_lo, '%1.2f'), num2str((ylim_lo+ylim_hi)/2, '%1.0f'), num2str(ylim_hi, '%1.2f')};
     yax.FontName = fontname;
     yax.FontSize = fontsize;
     
@@ -345,7 +345,7 @@ for w = 1:length(wm)
     
     hold off;
     
-   
+    
     %% Perform a One-way ANOVA for subfield: DV is wm measurement in head. Factor 2 is age group: child, adolescent, adult
     
     % Transform into long form for glm using demeaned measurements.
@@ -370,7 +370,7 @@ for w = 1:length(wm)
     
     % Check for significant predictors.
     mdlr.anova
-
+    
     clear m roi sub x y f1 hp3
-
+    
 end
