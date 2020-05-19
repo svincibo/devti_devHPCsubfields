@@ -139,7 +139,7 @@ for w = 1:length(wm)
         stat = mdlr2.anova;
         
         % Write to file.
-        fprintf(fid, '%s \t 1 %s \t\t %1.3f \t %3.3f \t %1.3f \t %1.3f \n', subregion{r}, modelspec, ...
+        fprintf(fid, '%s \t 2 %s \t\t %1.3f \t %3.3f \t %1.3f \t %1.3f \n', subregion{r}, modelspec, ...
             mdlr2.Rsquared.Adjusted, mdlr2.ModelCriterion.AICc, round(stat.F(2), 3), round(stat.pValue(2), 3));
         
         % 3. Linear interaction model.
@@ -160,7 +160,7 @@ for w = 1:length(wm)
         stat = mdlr3.anova;
         
         % Write to file.
-        fprintf(fid, '%s \t 1 %s \t\t %1.3f \t %3.3f \t %1.3f \t %1.3f \n', subregion{r}, modelspec, ...
+        fprintf(fid, '%s \t 3 %s \t\t %1.3f \t %3.3f \t %1.3f \t %1.3f \n', subregion{r}, modelspec, ...
             mdlr3.Rsquared.Adjusted, mdlr3.ModelCriterion.AICc, round(stat.F(2), 3), round(stat.pValue(2), 3));
         
         % 4. Nonlinear interactions model.
@@ -181,7 +181,7 @@ for w = 1:length(wm)
         stat = mdlr4.anova;
         
         % Write to file.
-        fprintf(fid, '%s \t 1 %s \t\t %1.3f \t %3.3f \t %1.3f \t %1.3f \n', subregion{r}, modelspec, ...
+        fprintf(fid, '%s \t 4 %s \t\t %1.3f \t %3.3f \t %1.3f \t %1.3f \n', subregion{r}, modelspec, ...
             mdlr4.Rsquared.Adjusted, mdlr4.ModelCriterion.AICc, round(stat.F(2), 3), round(stat.pValue(2), 3));
         
         %% Visualize.
