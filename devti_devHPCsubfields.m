@@ -28,7 +28,6 @@ subregion = {'b_ca1', 'b_ca23', 'b_dg', 'b_sub'};
 % Load removals: statistical outliers. (note motion outlier, sub90, is
 % included in statoutliers)
 load(fullfile(rootDir, 'supportFiles/devti_remove_statoutliers.mat'))
-
 %
 % % Load removals: motion.
 % load('devti_remove_motionoutliers.mat')
@@ -56,11 +55,10 @@ for w = 1:length(wm)
     % Convert data to table for easier model specification.
     data = array2table(cat(2, transpose(sub), transpose(age), transpose(group), transpose(sex), transpose(iq), m_demeaned), 'VariableNames', {'subID', 'age', 'group', 'sex',  'iq', roi{1, :}});
     data_raw = array2table(cat(2, transpose(sub), transpose(age), transpose(group), transpose(sex), transpose(iq), m), 'VariableNames', {'subID', 'age', 'group', 'sex',  'iq', roi{1, :}});
-    
-    % Create columns for hippocampal head by averaging across all hippocampal subfields within the head.
-    data.b_head = nanmean([data.b_ca1 data.b_ca23 data.b_dg data.b_sub], 2);
-    data.l_head = nanmean([data.l_ca1 data.l_ca23 data.l_dg data.l_sub], 2);
-    data.r_head = nanmean([data.r_ca1 data.r_ca23 data.r_dg data.r_sub], 2);
+       
+    % Tell Matlab that sex and age group are categorical variables.
+    data.sex = categorical(data.sex);
+    data.group = categorical(data.group);
     
     % One subfield at a time.
     for r = 1:length(subregion)
@@ -85,98 +83,86 @@ for w = 1:length(wm)
         end
         
         % 1. Linear main effects model.
-        modelspec = [subregion{r} ' ~ sex + age + (1|subID)'];
+        modelspec = [subregion{r} ' ~ sex + age'];
         if sum(remove) == 0
             
             % Fit regression model.
-            mdlr = fitlme(data, modelspec);
+            mdlr1 = fitlm(data, modelspec);
             
         else
             
             % Fit regression model, excluding outliers.
-            mdlr = fitlme(data, modelspec, 'Exclude', find(sum(data.subID == remove, 2)));
+            mdlr1 = fitlm(data, modelspec, 'Exclude', find(sum(data.subID == remove, 2)));
             
         end
-        
-        % Correct AIC for sample size and predictor number: AICc.
-        aicc = mdlr.ModelCriterion.AIC + 2*size(mdlr.PredictorNames, 1)*((size(mdlr.PredictorNames, 1) + 1)/(size(mdlr.ObservationInfo, 1) - size(mdlr.PredictorNames, 1) - 1));
-        
+
         % Get AIC value corrected for sample size: AICc.
-        disp(['AICc for ' wm{w} ' in ' subregion{r} ' using a model including linear main effects is ' num2str(aicc) '.']);
-        disp(['Adjusted R-squared for ' wm{w} ' in ' subregion{r} ' using a model including linear main effects is ' num2str(mdlr.Rsquared.Adjusted) '.']);
+        disp(['AICc for ' wm{w} ' in ' subregion{r} ' using a model including linear main effects is ' num2str(mdlr1.ModelCriterion.AICc) '.']);
+        disp(['Adjusted R-squared for ' wm{w} ' in ' subregion{r} ' using a model including linear main effects is ' num2str(mdlr1.Rsquared.Adjusted) '.']);
         
-        mdlr.anova
+        mdlr1.anova
         clear mdlr
         
         % 2. Nonlinear main effects model.
-        modelspec = [subregion{r} ' ~ sex + age^2 + (1|subID)'];
+        modelspec = [subregion{r} ' ~ sex + age^2'];
         if sum(remove) == 0
             
             % Fit regression model.
-            mdlr = fitlme(data, modelspec);
+            mdlr2 = fitlm(data, modelspec);
             
         else
             
             % Fit regression model, excluding outliers.
-            mdlr = fitlme(data, modelspec, 'Exclude', find(sum(data.subID == remove, 2)));
+            mdlr2 = fitlm(data, modelspec, 'Exclude', find(sum(data.subID == remove, 2)));
             
         end
-        
-        % Correct AIC for sample size and predictor number: AICc.
-        aicc = mdlr.ModelCriterion.AIC + 2*size(mdlr.PredictorNames, 1)*((size(mdlr.PredictorNames, 1) + 1)/(size(mdlr.ObservationInfo, 1) - size(mdlr.PredictorNames, 1) - 1));
-        
+ 
         % Get AIC value corrected for sample size: AICc.
-        disp(['AICc for ' wm{w} ' in ' subregion{r} ' using a model including nonlinear main effects is ' num2str(aicc) '.']);
-        disp(['Adjusted R-squared for ' wm{w} ' in ' subregion{r} ' using a model including nonlinear main effects is ' num2str(mdlr.Rsquared.Adjusted) '.']);
+        disp(['AICc for ' wm{w} ' in ' subregion{r} ' using a model including nonlinear main effects is ' num2str(mdlr2.ModelCriterion.AICc) '.']);
+        disp(['Adjusted R-squared for ' wm{w} ' in ' subregion{r} ' using a model including nonlinear main effects is ' num2str(mdlr2.Rsquared.Adjusted) '.']);
         
-        mdlr.anova
+        mdlr2.anova
         clear mdlr
         
         % 3. Linear interaction model.
-        modelspec = [subregion{r} ' ~ sex*age + (1|subID)'];
+        modelspec = [subregion{r} ' ~ sex*age'];
         if sum(remove) == 0
             
             % Fit regression model.
-            mdlr_lim = fitlme(data, modelspec);
+            mdlr3 = fitlm(data, modelspec);
             
         else
             
             % Fit regression model, excluding outliers.
-            mdlr_lim = fitlme(data, modelspec, 'Exclude', find(sum(data.subID == remove, 2)));
+            mdlr3 = fitlm(data, modelspec, 'Exclude', find(sum(data.subID == remove, 2)));
             
         end
-        
-        % Correct AIC for sample size and predictor number: AICc.
-        aicc = mdlr_lim.ModelCriterion.AIC + 2*size(mdlr_lim.PredictorNames, 1)*((size(mdlr_lim.PredictorNames, 1) + 1)/(size(mdlr_lim.ObservationInfo, 1) - size(mdlr_lim.PredictorNames, 1) - 1));
-        
+
         % Get AIC value corrected for sample size: AICc.
-        disp(['AICc for ' wm{w} ' in ' subregion{r} ' using a model including linear interactions is ' num2str(aicc) '.']);
-        disp(['Adjusted R-squared for ' wm{w} ' in ' subregion{r} ' using a model including linear interactions is ' num2str(mdlr_lim.Rsquared.Adjusted) '.']);
+        disp(['AICc for ' wm{w} ' in ' subregion{r} ' using a model including linear interactions is ' num2str(mdlr3.ModelCriterion.AICc) '.']);
+        disp(['Adjusted R-squared for ' wm{w} ' in ' subregion{r} ' using a model including linear interactions is ' num2str(mdlr3.Rsquared.Adjusted) '.']);
         
-        mdlr_lim.anova
+        mdlr3.anova
         
         % 4. Nonlinear interactions model.
-        modelspec = [subregion{r} ' ~ sex*(age^2) + (1|subID)'];
+        modelspec = [subregion{r} ' ~ sex*(age^2)'];
         if sum(remove) == 0
             
             % Fit regression model.
-            mdlr_nlim = fitlme(data, modelspec);
+            mdlr4 = fitlm(data, modelspec);
             
         else
             
             % Fit regression model, excluding outliers.
-            mdlr_nlim = fitlme(data, modelspec, 'Exclude', find(sum(data.subID == remove, 2)));
+            mdlr4 = fitlm(data, modelspec, 'Exclude', find(sum(data.subID == remove, 2)));
             
         end
-        
-        % Correct AIC for sample size and predictor number: AICc.
-        aicc = mdlr_nlim.ModelCriterion.AIC + 2*size(mdlr_nlim.PredictorNames, 1)*((size(mdlr_nlim.PredictorNames, 1) + 1)/(size(mdlr_nlim.ObservationInfo, 1) - size(mdlr_nlim.PredictorNames, 1) - 1));
-        
+
         % Get AIC value corrected for sample size: AICc.
-        disp(['AICc for ' wm{w} ' in ' subregion{r} ' using a model including nonlinear interactions is ' num2str(aicc) '.']);
-        disp(['Adjusted R-squared for ' wm{w} ' in ' subregion{r} ' using a model including nonlinear interactions is ' num2str(mdlr_nlim.Rsquared.Adjusted) '.']);
+        disp(['AICc for ' wm{w} ' in ' subregion{r} ' using a model including nonlinear interactions is ' num2str(mdlr4.ModelCriterion.AICc) '.']);
+        disp(['Adjusted R-squared for ' wm{w} ' in ' subregion{r} ' using a model including nonlinear interactions is ' num2str(mdlr4.Rsquared.Adjusted) '.']);
         
-        mdlr_nlim.anova
+        mdlr4.anova
         
         %% Visualize.
         
@@ -198,7 +184,7 @@ for w = 1:length(wm)
         x = data.age(keep_idx);
         
         % Select covariates.
-        sex = data.sex(keep_idx);
+        sex = double(data.sex(keep_idx));
         
         % Known from prior testing: linear interactions model is best for FA
         % while non-linear interactions model is best for MD.
@@ -206,69 +192,69 @@ for w = 1:length(wm)
             
             degp = 2;
             
-            modelspec1 = [subregion{r} ' ~ sex + (1|subID)'];
+            modelspec1 = [subregion{r} ' ~ sex'];
             modelspec2 = 'res ~ (age)^2';
             
             if sum(remove) == 0
                 
                 % Get and remove residuals.
-                mdlr = fitlme(data, modelspec1);
+                mdlr = fitlm(data, modelspec1);
                 data.res = table2array(mdlr.Residuals(:, 1));
                 
                 % Fit regression model.
-                mdlr_lim = fitlme(data, modelspec2);
+                mdlr3 = fitlm(data, modelspec2);
                 
             else
                 
                 data = data(keep_idx, :);
                 
                 % Get and remove residuals.
-                mdlr = fitlme(data, modelspec1);
+                mdlr = fitlm(data, modelspec1);
                 data.res = table2array(mdlr.Residuals(:, 1));
                 
                 % Fit regression model, excluding outliers.
-                mdlr_lim = fitlme(data, modelspec2);
+                mdlr3 = fitlm(data, modelspec2);
                 
             end
             
             % Select y-data: ".. adjusted y-data were calculated by adding the residual
             % to the fitted value for each point." Figure 2 in Schlichting et al., JoCN, 2018.
             % I used the "raw residuals", i.e., column 1.
-            y = mdlr_lim.Fitted + table2array(mdlr_lim.Residuals(:, 1));
+            y = mdlr3.Fitted + table2array(mdlr3.Residuals(:, 1));
             
         elseif strcmp(wm{w}, 'md')
             
             degp = 1;
             
-            modelspec1 = [subregion{r} ' ~ sex + (1|subID)'];
+            modelspec1 = [subregion{r} ' ~ sex'];
             modelspec2 = 'res ~ age';
             
             if sum(remove) == 0
                 
                 % Get and remove residuals.
-                mdlr = fitlme(data, modelspec1);
+                mdlr = fitlm(data, modelspec1);
                 data.res = table2array(mdlr.Residuals(:, 1));
                 
                 % Fit regression model.
-                mdlr_lim = fitlme(data, modelspec2);
+                mdlr3 = fitlm(data, modelspec2);
                 
             else
                 
                 data = data(keep_idx, :);
                 
                 % Get and remove residuals.
-                mdlr = fitlme(data, modelspec1);
+                mdlr = fitlm(data, modelspec1);
                 data.res = table2array(mdlr.Residuals(:, 1));
                 
                 % Fit regression model, excluding outliers.
-                mdlr_lim = fitlme(data, modelspec2);
+                mdlr3 = fitlm(data, modelspec2);
                 
             end
             
             % Select y-data: ".. adjusted y-data were calculated by adding the residual
             % to the fitted value for each point." Figure 2 in Schlichting et al., JoCN, 2018.
             % I used the "raw residuals", i.e., column 1.
-            y = mdlr_lim.Fitted + table2array(mdlr_lim.Residuals(:, 1));
+            y = mdlr3.Fitted + table2array(mdlr3.Residuals(:, 1));
             
         else
             
@@ -297,9 +283,9 @@ for w = 1:length(wm)
         end
         
         % Correlations between age and average WM measure in ROI.
-        scatter(x(~isnan(y) & sex == 1), y(~isnan(y) & sex == 1), 'Marker', 'o', 'MarkerEdgeColor', clr, 'LineWidth', linewidth)
+        scatter(x(~isnan(y) & sex == 1), y(~isnan(y) & sex == 1), 'Marker', 'x', 'MarkerEdgeColor', clr, 'LineWidth', linewidth)
         hold on;
-        scatter(x(~isnan(y) & sex == 2), y(~isnan(y) & sex == 2), 'Marker', 'x', 'MarkerEdgeColor', clr, 'LineWidth', linewidth)
+        scatter(x(~isnan(y) & sex == 2), y(~isnan(y) & sex == 2), 'Marker', 'o', 'MarkerEdgeColor', clr, 'LineWidth', linewidth)
         
         c1 = polyfit(x(~isnan(y)), y(~isnan(y)), degp);
         x1 = linspace(0,30);
@@ -321,7 +307,7 @@ for w = 1:length(wm)
     if strcmp(wm{w}, 'fa')
         
         ylab = 'Fractional Anisotropy, demeaned, adjusted';
-        ylim_lo = -0.07; ylim_hi = 0.07;
+        ylim_lo = -0.05; ylim_hi = 0.05;
         %         ylim_lo = -01; ylim_hi = -0.4; % for log transform
         
     elseif strcmp(wm{w}, 'md')
@@ -378,7 +364,7 @@ for w = 1:length(wm)
     %% Perform a Two-way ANOVA for subfield: DV is wm measurement, Factor 1 is subfield: b_ca1, b_ca23, b_dg, b_sub, Factor 2 is age group: child, adolescent, adult
     
     % Transform into long form for glm using demeaned measurements.
-    data_prefix = table2array(data(:, 1:5));
+    data_prefix = [data.subID data.age double(data.group) double(data.sex) data.iq];
     
     b_ca1 = data.b_ca1;
     b_ca1_idx = repmat(1, size(b_ca1));
@@ -398,6 +384,10 @@ for w = 1:length(wm)
     
     d_array = cat(2, data_prefix_new, wm_measure_idx, wm_measure);
     d = array2table(d_array, 'VariableNames', {'subID', 'age', 'group', 'sex',  'iq', 'subfield', 'measurement'});
+    
+    % Tell Matlab that sex and age group are categorical variables.
+    d.sex = categorical(d.sex);
+    d.group = categorical(d.group);
     
     modelspec = 'measurement ~ sex + subfield*group';
     

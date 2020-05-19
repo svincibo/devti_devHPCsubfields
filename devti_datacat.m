@@ -4,35 +4,64 @@
 clear all; close all; clc
 format long g
 
-blprojectid = 'proj-5e5672430f7fa65e1d3c9621/act';
-% For fsldtifit measurements use: proj-5e5672430f7fa65e1d3c9621
-% For mrtrix3 act measurements use: proj-5e5672430f7fa65e1d3c9621/act
+blprojectid = 'proj-5e5672430f7fa65e1d3c9621';
 
 % Select WM measure.
 wm = {'fa', 'md'};
 
 % Set working directories.
 rootDir = '/Volumes/240/devti_devHPCsubfields';
-%rng default % for reproducibility
 
 % Get age.
-load(fullfile(rootDir, 'supportFiles/data.mat'))
-subs = array2table(data, 'VariableNames', {'subID', 'cov_age', 'iq', 'gp_age', 'a', 'b', 'c', 'd', 'e'});
+load(fullfile(rootDir, 'supportFiles/devti_sex_all.mat'))
+load(fullfile(rootDir, 'supportFiles/age_n=79.mat'))
 
-% Add fix so to account for leading zeros in file names.
-for k = 1:length(subs.subID)
+for p = 1:length(subnumbers)
     
-    if subs.subID(k) < 10
+    if find(subID == subnumbers(p))
         
-        subID{k, 1} = strcat('00', num2str(subs.subID(k)));
+        su_temp(p) = subnumbers(p);
         
-    else
+        a_temp(p) = day2age(p);
         
-        subID{k, 1} = strcat('0', num2str(subs.subID(k)));
+        if a_temp(p) >= 18.0
+            
+            ag_temp(p) = 3; % adult
+            
+        elseif a_temp(p) < 12.0
+            
+            ag_temp(p) = 1; % child
+            
+        else
+            
+            ag_temp(p) = 2; % adolescent
+            
+        end
+        
+        se_temp(p) = sex(find(subID == subnumbers(p)));
         
     end
     
 end
+clear sex
+
+% load(fullfile(rootDir, 'supportFiles/data.mat'))
+subs = array2table(cat(2, transpose(su_temp), transpose(a_temp), transpose(ag_temp), transpose(se_temp)), 'VariableNames', {'subID', 'age', 'agegroup', 'sex'});
+
+% % Add fix so to account for leading zeros in file names.
+% for k = 1:length(subs.subID)
+%     
+%     if subs.subID(k) < 10
+%         
+%         subID{k, 1} = strcat('00', num2str(subs.subID(k)));
+%         
+%     else
+%         
+%         subID{k, 1} = strcat('0', num2str(subs.subID(k)));
+%         
+%     end
+%     
+% end
 
 %% ROI.
 
@@ -46,7 +75,6 @@ grp_contents = grp_contents(arrayfun(@(x) x.name(1), grp_contents) ~= '.');
 grp_contents = grp_contents(arrayfun(@(x) x.name(1), grp_contents) == 's');
 
 % Do for each wm measure.
-
 for w = 1:size(wm, 2)
     
     % Load in each ROI's measures for this subject.
@@ -61,14 +89,14 @@ for w = 1:size(wm, 2)
             sub_count = sub_count +1;
             
             % Get contents of the directory where the tract measures for this subject are stored.
-            sub_contents_rois = dir(fullfile(grp_contents(i).folder, grp_contents(i).name, ['/dt-raw.tag-tensor_metrics*/' wm{w} '*.nii.gz']));
+            sub_contents_rois = dir(fullfile(grp_contents(i).folder, grp_contents(i).name, ['/dt-raw.tag-tensor_metrics*/' wm{w} '*_ROI_b_*.nii.gz']));
             
             % Remove the '.' and '..' files.
             sub_contents_rois = sub_contents_rois(arrayfun(@(x) x.name(1), sub_contents_rois) ~= '.');
             
             for j = 1:size(sub_contents_rois)
                 
-                % Read in data for this subject and this tract.
+                % Read in data for this subject and this roi.
                 data_temp = niftiread(fullfile(sub_contents_rois(j).folder, sub_contents_rois(j).name));
                 
                 % Convert all zeros to NaN.
@@ -85,17 +113,16 @@ for w = 1:size(wm, 2)
                 sub(sub_count) = str2num(grp_contents(i).name(end-2:end));
                 
                 % Grab age.
-                age(sub_count) = subs.cov_age(subs.subID == sub(sub_count));
+                age(sub_count) = subs.age(subs.subID == sub(sub_count));
                 
-                % Get age group.
-                group(sub_count) = subs.gp_age(subs.subID == sub(sub_count));
+%                 % Get age group.
+                group(sub_count) = subs.agegroup(subs.subID == sub(sub_count));
                 
-                % Grab sex. 1 = F, 2 = M
-                %sex(sub_count) = subs.cov_sex(subs.subID == sub(sub_count));
-                sex(sub_count) = randi([1 2]); %temporary until I find the data for this
+                % Grab sex. 1 = M, 2 = F
+                sex(sub_count) = subs.sex(subs.subID == sub(sub_count));
                 
-                % Grab IQ.
-                iq(sub_count) = subs.iq(subs.subID == sub(sub_count));
+%                 % Grab IQ.
+%                 iq(sub_count) = subs.iq(subs.subID == sub(sub_count));
 
                 clear data_temp
                 
@@ -105,7 +132,7 @@ for w = 1:size(wm, 2)
         
     end % end i
     
-    save(fullfile(rootDir, ['supportFiles/devti_data_' wm{w} '_mrtrix3act.mat']), 'sub', 'age', 'group', 'sex', 'iq', 'roi', 'm')
+    save(fullfile(rootDir, ['supportFiles/devti_data_' wm{w} '_mrtrix3act.mat']), 'sub', 'age', 'group', 'sex', 'roi', 'm')
     
     clear sub age roi m group
     
