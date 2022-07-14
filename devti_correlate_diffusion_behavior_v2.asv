@@ -787,7 +787,7 @@ yax.FontSize = fontsize;
 yax.FontAngle = fontangle;
    
 % legend off;
-legend({'Age', 'Younger (6 year', 'Middle' , 'Older'})
+% legend({'', 'Female', 'Male'})
 box off; 
 legend('box', 'off');
 l = legend('location', 'southeast'); l.FontSize = fontsize;
