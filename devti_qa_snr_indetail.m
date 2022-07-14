@@ -7,7 +7,7 @@ format shortG
 blprojectid = 'proj-5e5672430f7fa65e1d3c9621';
 
 % Set working directories.
-rootDir = '/Volumes/240/devti_devHPCsubfields/';
+rootDir = '/Volumes/Seagate/devti_devHPCsubfields/';
 
 % Read in behavioral data.
 load(fullfile(rootDir, 'supportFiles/data.mat'));
@@ -93,14 +93,18 @@ fontangle = 'italic';
 xticklength = 0;
 alphablend = .8;
 
-yc_color = [0.6350 0.0780 0.1840]; %red
-oc_color = [0 0.4470 0.7410]; %blue
-a_color = [0.41176 0.41176 0.41176]; %gray
+yc_color  = [50 180 100]/255; 
+oc_color = [50 100 180]/255; 
+a_color = [100 50 180]/255;
+
+% yc_color = [0.6350 0.0780 0.1840]; %red
+% oc_color = [0 0.4470 0.7410]; %blue
+% a_color = [0.41176 0.41176 0.41176]; %gray
 
 gscatter(m, 1:length(m), group, [yc_color; oc_color; a_color], '.', 20)
 hold on;
 gscatter(b0, 1:length(b0), group, [yc_color; oc_color; a_color], 'x', 8)
-plot([20 20], [0 length(subID)+0.5], ':k')
+% plot([5 5], [0 length(subID)+0.5], ':k')
 
 for p = 1:length(m)
     
@@ -129,7 +133,7 @@ xax.TickDirection = 'out';
 xax.TickLength = [xticklength xticklength];
 xax.FontName = fontname;
 xax.FontSize = fontsize;
-xax.FontAngle = fontangle;
+% xax.FontAngle = fontangle;
 
 % yaxis
 yax = get(gca,'yaxis');
@@ -151,6 +155,10 @@ legend box off
 a.XLabel.String = 'SNR';
 a.XLabel.FontSize = fontsize;
 pbaspect([1 1 1])
+
+a.YLabel.String = 'Subject ID';
+a.YLabel.FontSize = fontsize;
+a.YLabel.FontAngle = 'italic';
 
 print(fullfile(rootDir, 'plots', 'plot_snr'), '-dpng')
 

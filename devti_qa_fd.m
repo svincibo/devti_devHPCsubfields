@@ -1,19 +1,19 @@
 clear all; close all; clc
 format shortG
 
-yc_color = [0.6350 0.0780 0.1840]; %red
-oc_color = [0 0.4470 0.7410]; %blue
-a_color = [0.41176 0.41176 0.41176]; %gray
+yc_color  = [50 180 100]/255; 
+oc_color = [50 100 180]/255; 
+a_color = [100 50 180]/255;
 
 blprojectid = '5e5672430f7fa65e1d3c9621';
 
 % Set working directories.
-rootDir = '/Volumes/240/devti_devHPCsubfields/';
+rootDir = '/Volumes/Seagate/devti_devHPCsubfields/';
 % addpath(genpath(fullfile(rootDir, 'proj-5e5672430f7fa65e1d3c9621')));
 
 remove_outliers = 'yes';
 include = 'all'; % all, childrenonly
-outlier = [90];
+outlier = [11 90];
 
 %%%%%%%%%%%%%%% TESTING AREA %%%%%%%%%%%%%%%%
 
@@ -58,7 +58,7 @@ for t = 1:size(grp_contents, 1)
     sub_contents_motion = sub_contents_motion(arrayfun(@(x) x.name(1), sub_contents_motion) ~= '.');
     
     % Get SNR for this subject.
-    load([sub_contents_motion.folder filesep sub_contents_motion.name]);
+    load(fullfile(sub_contents_motion.folder, sub_contents_motion.name));
     
     % Select only the translation/rotation parameters.
     mot = vertcat(xform(:).ecParams);
@@ -184,7 +184,6 @@ xlabels = {'0', '5', '10', '15', '20', '25', '30'};
 xax.TickLabels = xlabels;
 xax.FontName = fontname;
 xax.FontSize = fontsize;
-xax.FontAngle = fontangle;
 
 % yaxis
 ylim_lo = 0; ylim_hi = 1;
@@ -196,13 +195,14 @@ yax.TickLength = [xticklength xticklength];
 yax.TickLabels = {num2str(ylim_lo, '%1.0f'), '', num2str(ylim_hi, '%1.0f')};
 yax.FontName = fontname;
 yax.FontSize = fontsize;
+yax.FontAngle = fontangle;
 
 % general
 a = gca;
 %     a.TitleFontWeight = 'normal';
 box off
 
-a.YLabel.String = 'Mean Framewise Displacement (FD)';
+a.YLabel.String = 'Framewise Displacement (FD)';
 
 a.YLabel.FontSize = fontsize;
 pbaspect([1 1 1])
@@ -238,7 +238,7 @@ xlabels = cellfun(@(x) strrep(x, ',', '\newline'), xlabels, 'UniformOutput', fal
 xax.TickLabels = xlabels;
 xax.FontName = fontname;
 xax.FontSize = fontsize;
-xax.FontAngle = fontangle;
+% xax.FontAngle = fontangle;
 
 % yaxis
 yax = get(gca,'yaxis');
@@ -249,13 +249,14 @@ yax.TickLength = [xticklength xticklength];
 yax.TickLabels = {num2str(ylim_lo, '%1.0f'), '', num2str(ylim_hi, '%1.0f')};
 yax.FontName = fontname;
 yax.FontSize = fontsize;
+yax.FontAngle = fontangle;
 
 % general
 a = gca;
 %     a.TitleFontWeight = 'normal';
 box off
 
-a.YLabel.String = 'Mean Framewise Displacement (FD)';
+a.YLabel.String = 'Framewise Displacement (FD)';
 
 a.YLabel.FontSize = fontsize;
 pbaspect([1 1 1])
@@ -271,3 +272,6 @@ outliers.motion = 90;
 % outliers.motion = subID(meanmotion>2);
 
 save('devti_remove_motionoutliers.mat', 'outliers')
+
+[r, p] = corrcoef(age, meanmotion)
+

@@ -4,16 +4,16 @@
 clear all; close all; clc
 format shortG
 
-remove_outliers = 'no';
+remove_outliers = 'yes';
 % Identify outliers to be removed.
-% outlier = [108 315 318];% 128 315 318];
+outlier = [11 90];
 
 include = 'all';
 
 blprojectid = 'proj-5e5672430f7fa65e1d3c9621';
 
 % Set working directories.
-rootDir = '/Volumes/240/devti_devHPCsubfields/';
+rootDir = '/Volumes/Seagate/devti_devHPCsubfields/';
 
 % Read in behavioral data.
 load(fullfile(rootDir, 'supportFiles/data.mat'));
@@ -29,63 +29,66 @@ grp_contents = grp_contents(arrayfun(@(x) x.name(1), grp_contents) == 's');
 % Load in each tract's tractography measures for this subject.
 sub_count = 0;
 for s = 1:size(grp_contents, 1)
-    
+
     % Only collect values for subjects that have both MRI and behaviora/demographic data.
     if ~isempty(find((data(:, 1)  == str2num(grp_contents(s).name(5:7)))))
-        
+
         % Display current sub ID.
         disp(grp_contents(s).name)
-        
+
         % Update subject counter for when not all subjects are used/needed.
         sub_count = sub_count + 1;
-        
+
         % Get contents of the directory where the SNR values for this subject are stored.
         sub_contents_snr = dir(fullfile(grp_contents(s).folder, grp_contents(s).name, '/dt-raw.tag-snr*/*product.json'));
         % Remove the '.' and '..' files.
         sub_contents_snr = sub_contents_snr(arrayfun(@(x) x.name(1), sub_contents_snr) ~= '.');
-        
+
         % Get SNR for this subject.
         data_snr_temp = jsondecode(fileread([sub_contents_snr.folder filesep sub_contents_snr.name]));
-        
-            % Get SNR in b0 images.
-            b0(sub_count) = str2num(data_snr_temp.SNRInB0_X_Y_Z{1});
-            
-            % Get mean SNR in X, Y, and Z directions.
-            m(sub_count) = mean([str2num(data_snr_temp.SNRInB0_X_Y_Z{2}), str2num(data_snr_temp.SNRInB0_X_Y_Z{3}), str2num(data_snr_temp.SNRInB0_X_Y_Z{4})]);
-            
-            % Get subID.
-            subID(sub_count) = str2num(grp_contents(s).name(5:7));
-            
-            % Get training group.
-            group(sub_count) = data(find((data(:, 1) == str2num(grp_contents(s).name(5:7)))), 4);
+
+        % Get SNR in b0 images.
+        b0(sub_count) = str2num(data_snr_temp.SNRInB0_X_Y_Z{1});
+
+        % Get mean SNR in X, Y, and Z directions.
+        m(sub_count) = mean([str2num(data_snr_temp.SNRInB0_X_Y_Z{2}), str2num(data_snr_temp.SNRInB0_X_Y_Z{3}), str2num(data_snr_temp.SNRInB0_X_Y_Z{4})]);
+
+        % Get subID.
+        subID(sub_count) = str2num(grp_contents(s).name(5:7));
+
+        % Get training group.
+        group(sub_count) = data(find((data(:, 1) == str2num(grp_contents(s).name(5:7)))), 4);
+
+        % Get age
+        age(sub_count) = data(find((data(:, 1) == str2num(grp_contents(s).name(5:7)))), 2);
 
         clear data_snr_temp get_temp
-        
+
     end % end if exist
-    
+
 end % end t
 
 % Remove outliers.
 if strcmp(remove_outliers, 'yes') && exist('outlier')
-    
+
     % Get index for outliers to be removed.
     idx_outlier = ismember(subID, outlier);
-    
+
     % Remove outliers.
     subID = subID(~idx_outlier);
-    snr = snr(~idx_outlier);
+    b0 = b0(~idx_outlier);
+    m = m(~idx_outlier);
     group = group(~idx_outlier);
     age = age(~idx_outlier);
-    ses = ses(~idx_outlier);
-    
+
     % Set figure note.
     ttlstr = 'SNR outlier removed.';
-    
+
 else
-    
+
     % Set figure note.
     ttlstr = 'SNR outlier retained.';
-    
+
 end
 
 % Write out table for anova.
@@ -150,9 +153,9 @@ alphablend = .8;
 ylim_lo = 0;
 ylim_hi = 40;
 
-yc_color = [0.6350 0.0780 0.1840]; %red
-oc_color = [0 0.4470 0.7410]; %blue
-a_color = [0.41176 0.41176 0.41176]; %gray
+yc_color  = [50 180 100]/255;
+oc_color = [50 100 180]/255;
+a_color = [100 50 180]/255;
 
 % Controls
 b1 = bar(1, nanmean(snr(group == 1)), 'FaceColor', yc_color, 'EdgeColor', yc_color, 'FaceAlpha', alphablend);
@@ -175,7 +178,6 @@ xlabels = cellfun(@(x) strrep(x, ',', '\newline'), xlabels, 'UniformOutput', fal
 xax.TickLabels = xlabels;
 xax.FontName = fontname;
 xax.FontSize = fontsize;
-xax.FontAngle = fontangle;
 
 % yaxis
 yax = get(gca,'yaxis');
@@ -186,6 +188,7 @@ yax.TickLength = [xticklength xticklength];
 yax.TickLabels = {num2str(ylim_lo, '%1.0f'), '', num2str(ylim_hi, '%1.0f')};
 yax.FontName = fontname;
 yax.FontSize = fontsize;
+yax.FontAngle = fontangle;
 
 % general
 a = gca;
@@ -229,7 +232,6 @@ xlabels = cellfun(@(x) strrep(x, ',', '\newline'), xlabels, 'UniformOutput', fal
 xax.TickLabels = xlabels;
 xax.FontName = fontname;
 xax.FontSize = fontsize;
-xax.FontAngle = fontangle;
 
 % yaxis
 yax = get(gca,'yaxis');
@@ -240,6 +242,7 @@ yax.TickLength = [xticklength xticklength];
 yax.TickLabels = {num2str(ylim_lo, '%1.0f'), '', num2str(ylim_hi, '%1.0f')};
 yax.FontName = fontname;
 yax.FontSize = fontsize;
+yax.FontAngle = fontangle;
 
 % general
 a = gca;
@@ -255,4 +258,7 @@ print(fullfile(rootDir, 'plots', 'plot_barplot_snr_weighted_bygroup'), '-dpng')
 print(fullfile(rootDir, 'plots', 'eps', 'plot_barplot_snr_weighted_bygroup'), '-depsc')
 
 hold off;
+
+[r, p] = corrcoef(age, b0)
+[r, p] = corrcoef(age, m)
 
