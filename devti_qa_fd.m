@@ -8,7 +8,7 @@ a_color = [100 50 180]/255;
 blprojectid = '5e5672430f7fa65e1d3c9621';
 
 % Set working directories.
-rootDir = '/Volumes/Seagate/devti_devHPCsubfields/';
+rootdir = '/Volumes/Seagate/devti_devHPCsubfields/';
 % addpath(genpath(fullfile(rootDir, 'proj-5e5672430f7fa65e1d3c9621')));
 
 remove_outliers = 'yes';
@@ -24,14 +24,13 @@ outlier = [11 90];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Read in behavioral data.
-load(fullfile(rootDir, 'supportFiles/data.mat'))
-data_beh = array2table(data, 'VariableNames', {'subID', 'cov_age', 'iq', 'gp_age', 'a', 'b', 'c', 'd', 'e'});
+data_beh = readtable([rootdir 'supportFiles/devti_data_beh_forSPSS_20220705.csv'], 'TreatAsEmpty', {'.', 'na'});
 
 % Read in additional behavioral data, sex.
-data_sex = readtable(fullfile(rootDir, 'supportFiles/devti_sex_all.csv'));
+data_sex = readtable(fullfile(rootdir, 'supportFiles/devti_sex_all.csv'));
 
 % Get contents of the directory where the tract measures for this subject are stored.
-grp_contents = dir(fullfile(rootDir, ['proj-' blprojectid]));
+grp_contents = dir(fullfile(rootdir, ['proj-' blprojectid]));
 
 % Remove the '.' and '..' files.
 grp_contents = grp_contents(arrayfun(@(x) x.name(1), grp_contents) ~= '.');
@@ -84,10 +83,10 @@ for t = 1:size(grp_contents, 1)
     subID(sub_count) = str2num(grp_contents(t).name(5:7));
     
     % Get age group.
-    group(sub_count) = data_beh.gp_age(find((data_beh.subID == str2num(grp_contents(t).name(6:7)))));
+    group(sub_count) = data_beh.group(find((data_beh.subID == str2num(grp_contents(t).name(6:7)))));
     
     %     % Get age in months.
-    age(sub_count) = data_beh.cov_age(find((data_beh.subID == str2num(grp_contents(t).name(5:7)))));
+    age(sub_count) = data_beh.age(find((data_beh.subID == str2num(grp_contents(t).name(5:7)))));
     
     clear data_snr_temp get_temp
     
@@ -121,7 +120,7 @@ meanmotion = mean(motion, 2);
 
 % Write out table for anova.
 t_out = array2table(cat(2, subID', group', age', meanmotion), 'VariableNames', {'subID', 'group_age', 'cov_age', 'fd'});
-writetable(t_out, fullfile(rootDir, 'supportFiles', ['devti_data_motion_' include '.csv']));
+writetable(t_out, fullfile(rootdir, 'supportFiles', ['devti_data_motion_' include '.csv']));
 
 disp('Check for group differences in FD.')
 [~, tableout, ~] = anova1(meanmotion, group', 'off');
@@ -131,33 +130,33 @@ disp('Check for correlation between age and FD.')
 [rho, p] = corr([meanmotion group']);
 disp(['r = ' num2str(rho(1, 2)) ', p = ' num2str(p(1, 2)) '.'])
 
-%Visualize: correlation.
-figure(1)
-plot(age(group==1)', meanmotion(group==1)', 'LineStyle', 'none', 'MarkerEdgeColor', yc_color, 'MarkerFaceColor', yc_color, 'Marker', 'o', 'MarkerSize', 10) % use all subjects for this
-hold on
-plot(age(group==2)', meanmotion(group==2)', 'LineStyle', 'none', 'MarkerEdgeColor', oc_color, 'MarkerFaceColor', oc_color, 'Marker', 'o', 'MarkerSize', 10)
-% [rc, pc] = plotcorr(age(group~=3)', meanmotion(group~=3), [], [], [], 'k:');
-if strcmp(include, 'all')
-    plot(age(group==3)', meanmotion(group==3), 'LineStyle', 'none', 'MarkerEdgeColor', a_color, 'MarkerFaceColor', a_color, 'Marker', 'o', 'MarkerSize', 10)
-%     r_a = plotcorr(age(group==3)', meanmotion(group==3), [], [], [], 'k:');
-    r_all = plotcorr(age', meanmotion, [], [], [], 'k');
-    xlim_lo = min(age)-1;
-    xlim_hi = max(age)+1;
-    ylim_lo = min(meanmotion)-1;
-    ylim_hi = max(meanmotion)+1;
-else
-    legend({'Children', 'Adolescents', ['Children, r = ' num2str(rc, '%.3f') 'p = ' num2str(pc, '%.3f')]}, 'Location', 'southwest')
-    xlim_lo = min(age)-1;
-    xlim_hi = max(age)+1;
-    ylim_lo = min(meanmotion(group~=3))-1;
-    ylim_hi = max(meanmotion(group~=3))+1;
-end
-legend('boxoff');
-legend('off');
-
-xlabel('Age (years)')
-% title('Correlations between Age and FD')
-
+% %Visualize: correlation.
+% figure(1)
+% plot(age(group==1)', meanmotion(group==1)', 'LineStyle', 'none', 'MarkerEdgeColor', yc_color, 'MarkerFaceColor', yc_color, 'Marker', 'o', 'MarkerSize', 10) % use all subjects for this
+% hold on
+% plot(age(group==2)', meanmotion(group==2)', 'LineStyle', 'none', 'MarkerEdgeColor', oc_color, 'MarkerFaceColor', oc_color, 'Marker', 'o', 'MarkerSize', 10)
+% % [rc, pc] = plotcorr(age(group~=3)', meanmotion(group~=3), [], [], [], 'k:');
+% if strcmp(include, 'all')
+%     plot(age(group==3)', meanmotion(group==3), 'LineStyle', 'none', 'MarkerEdgeColor', a_color, 'MarkerFaceColor', a_color, 'Marker', 'o', 'MarkerSize', 10)
+% %     r_a = plotcorr(age(group==3)', meanmotion(group==3), [], [], [], 'k:');
+%     r_all = plotcorr(age', meanmotion, [], [], [], 'k');
+%     xlim_lo = min(age)-1;
+%     xlim_hi = max(age)+1;
+%     ylim_lo = min(meanmotion)-1;
+%     ylim_hi = max(meanmotion)+1;
+% else
+%     legend({'Children', 'Adolescents', ['Children, r = ' num2str(rc, '%.3f') 'p = ' num2str(pc, '%.3f')]}, 'Location', 'southwest')
+%     xlim_lo = min(age)-1;
+%     xlim_hi = max(age)+1;
+%     ylim_lo = min(meanmotion(group~=3))-1;
+%     ylim_hi = max(meanmotion(group~=3))+1;
+% end
+% legend('boxoff');
+% legend('off');
+% 
+% xlabel('Age (years)')
+% % title('Correlations between Age and FD')
+% 
 capsize = 0;
 marker = 'o';
 % markeredgecolor_h = [0 .73 .73]'; markeredgecolor_v = [.146 0 0]';
@@ -172,45 +171,45 @@ yticklength = 0;
 xticklength = 0.05;
 xtickvalues = [1 2 3];
 alphablend = .8;
-
-% xaxis
-xax = get(gca, 'xaxis');
-xax.Limits = [0 30];
-xax.TickValues = [0 5 10 15 20 25 30];
-xax.TickDirection = 'out';
-xax.TickLength = [xticklength xticklength];
-xlabels = {'0', '5', '10', '15', '20', '25', '30'};
-%     xlabels = cellfun(@(x) strrep(x, ',', '\newline'), xlabels, 'UniformOutput', false);
-xax.TickLabels = xlabels;
-xax.FontName = fontname;
-xax.FontSize = fontsize;
-
-% yaxis
-ylim_lo = 0; ylim_hi = 1;
-yax = get(gca,'yaxis');
-yax.Limits = [ylim_lo ylim_hi];
-yax.TickValues = [ylim_lo (ylim_lo+ylim_hi)/2 ylim_hi];
-yax.TickDirection = 'out';
-yax.TickLength = [xticklength xticklength];
-yax.TickLabels = {num2str(ylim_lo, '%1.0f'), '', num2str(ylim_hi, '%1.0f')};
-yax.FontName = fontname;
-yax.FontSize = fontsize;
-yax.FontAngle = fontangle;
-
-% general
-a = gca;
-%     a.TitleFontWeight = 'normal';
-box off
-
-a.YLabel.String = 'Framewise Displacement (FD)';
-
-a.YLabel.FontSize = fontsize;
-pbaspect([1 1 1])
-
-print(fullfile(rootDir, 'plots', ['plot_scatter_motion_' include]), '-dpng')
-print(fullfile(rootDir, 'plots', 'eps', ['plot_scatter_motion_' include]), '-depsc')
-
-hold off;
+% 
+% % xaxis
+% xax = get(gca, 'xaxis');
+% xax.Limits = [0 30];
+% xax.TickValues = [0 5 10 15 20 25 30];
+% xax.TickDirection = 'out';
+% xax.TickLength = [xticklength xticklength];
+% xlabels = {'0', '5', '10', '15', '20', '25', '30'};
+% %     xlabels = cellfun(@(x) strrep(x, ',', '\newline'), xlabels, 'UniformOutput', false);
+% xax.TickLabels = xlabels;
+% xax.FontName = fontname;
+% xax.FontSize = fontsize;
+% 
+% % yaxis
+% ylim_lo = 0; ylim_hi = 2;
+% yax = get(gca,'yaxis');
+% yax.Limits = [ylim_lo ylim_hi];
+% yax.TickValues = [ylim_lo (ylim_lo+ylim_hi)/2 ylim_hi];
+% yax.TickDirection = 'out';
+% yax.TickLength = [xticklength xticklength];
+% yax.TickLabels = {num2str(ylim_lo, '%1.0f'), '', num2str(ylim_hi, '%1.0f')};
+% yax.FontName = fontname;
+% yax.FontSize = fontsize;
+% yax.FontAngle = fontangle;
+% 
+% % general
+% a = gca;
+% %     a.TitleFontWeight = 'normal';
+% box off
+% 
+% a.YLabel.String = 'Framewise Displacement (FD)';
+% 
+% a.YLabel.FontSize = fontsize;
+% pbaspect([1 1 1])
+% 
+% print(fullfile(rootDir, 'plots', ['plot_scatter_motion_' include]), '-dpng')
+% print(fullfile(rootDir, 'plots', 'eps', ['plot_scatter_motion_' include]), '-depsc')
+% 
+% hold off;
 
 % Visualize: group differences
 figure(2)
@@ -241,12 +240,13 @@ xax.FontSize = fontsize;
 % xax.FontAngle = fontangle;
 
 % yaxis
+ylim_lo = 0; ylim_hi = 2;
 yax = get(gca,'yaxis');
 yax.Limits = [ylim_lo ylim_hi];
 yax.TickValues = [ylim_lo (ylim_lo+ylim_hi)/2 ylim_hi];
 yax.TickDirection = 'out';
 yax.TickLength = [xticklength xticklength];
-yax.TickLabels = {num2str(ylim_lo, '%1.0f'), '', num2str(ylim_hi, '%1.0f')};
+yax.TickLabels = {num2str(ylim_lo, '%1.2f'), num2str((ylim_lo+ylim_hi)/2, '%1.2f'), num2str(ylim_hi, '%1.2f')};
 yax.FontName = fontname;
 yax.FontSize = fontsize;
 yax.FontAngle = fontangle;
@@ -261,17 +261,9 @@ a.YLabel.String = 'Framewise Displacement (FD)';
 a.YLabel.FontSize = fontsize;
 pbaspect([1 1 1])
 
-print(fullfile(rootDir, 'plots', 'plot_barplot_motion_all'), '-dpng')
-print(fullfile(rootDir, 'plots', 'eps', 'plot_barplot_motion_all'), '-depsc')
+print(fullfile(rootdir, 'plots', 'qa_barplot_fd'), '-dpng')
+print(fullfile(rootdir, 'plots', 'eps', 'qa_barplot_fd'), '-depsc')
 
 hold off;
 
-% Manually record outliers. Include observations with unusually high FD and any above 2mm. 
-% (0 indicates no outliers)
-outliers.motion = 90;
-% outliers.motion = subID(meanmotion>2);
-
-save('devti_remove_motionoutliers.mat', 'outliers')
-
-[r, p] = corrcoef(age, meanmotion)
 

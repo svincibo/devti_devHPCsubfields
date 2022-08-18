@@ -4,8 +4,8 @@
 clear all; close all; clc
 format shortG
 
+% Remove outliers, need to show in *the data that were used*.
 remove_outliers = 'yes';
-% Identify outliers to be removed.
 outlier = [11 90];
 
 include = 'all';
@@ -13,12 +13,13 @@ include = 'all';
 blprojectid = 'proj-5e5672430f7fa65e1d3c9621';
 
 % Set working directories.
-rootDir = '/Volumes/Seagate/devti_devHPCsubfields/';
+rootdir = '/Volumes/Seagate/devti_devHPCsubfields/';
 
 % Read in behavioral data.
-load(fullfile(rootDir, 'supportFiles/data.mat'));
+data = table2array(readtable([rootdir 'supportFiles/devti_data_beh_forSPSS_20220705.csv'], 'TreatAsEmpty', {'.', 'na'}));
+
 % Get contents of the directory where the tract measures for this subject are stored.
-grp_contents = dir(fullfile(rootDir, blprojectid));
+grp_contents = dir(fullfile(rootdir, blprojectid));
 
 % Remove the '.' and '..' files.
 grp_contents = grp_contents(arrayfun(@(x) x.name(1), grp_contents) ~= '.');
@@ -57,7 +58,7 @@ for s = 1:size(grp_contents, 1)
         subID(sub_count) = str2num(grp_contents(s).name(5:7));
 
         % Get training group.
-        group(sub_count) = data(find((data(:, 1) == str2num(grp_contents(s).name(5:7)))), 4);
+        group(sub_count) = data(find((data(:, 1) == str2num(grp_contents(s).name(5:7)))), 3);
 
         % Get age
         age(sub_count) = data(find((data(:, 1) == str2num(grp_contents(s).name(5:7)))), 2);
@@ -93,7 +94,7 @@ end
 
 % Write out table for anova.
 t_out = array2table(cat(2, subID', group', m', b0'), 'VariableNames', {'subID', 'group', 'm', 'b0'});
-writetable(t_out, fullfile(rootDir, 'supportFiles', 'devti_data_snr_indetail.csv'));
+writetable(t_out, fullfile(rootdir, 'supportFiles', 'devti_data_snr_indetail.csv'));
 
 % Group differences test
 disp('Are there b0 SNR differences among groups?')
@@ -151,20 +152,20 @@ xticklength = 0.05;
 xtickvalues = [1 2 3];
 alphablend = .8;
 ylim_lo = 0;
-ylim_hi = 40;
+ylim_hi = 45;
 
 yc_color  = [50 180 100]/255;
 oc_color = [50 100 180]/255;
 a_color = [100 50 180]/255;
 
 % Controls
-b1 = bar(1, nanmean(snr(group == 1)), 'FaceColor', yc_color, 'EdgeColor', yc_color, 'FaceAlpha', alphablend);
+b1 = bar(1, nanmean(snr(group == 1)), 'FaceColor', yc_color, 'EdgeColor', yc_color, 'FaceAlpha', .2);
 plot([1 1], [nanmean(snr(group == 1)) - nanstd(snr(group == 1)) nanmean(snr(group == 1)) + nanstd(snr(group == 1))], 'Color', yc_color)
 % Beginners
-b2 = bar(2, nanmean(snr(group == 2)), 'FaceColor', oc_color, 'EdgeColor', oc_color, 'FaceAlpha', alphablend);
+b2 = bar(2, nanmean(snr(group == 2)), 'FaceColor', oc_color, 'EdgeColor', oc_color, 'FaceAlpha', .2);
 plot([2 2], [nanmean(snr(group == 2)) - nanstd(snr(group == 2)) nanmean(snr(group == 2)) + nanstd(snr(group == 2))], 'Color', oc_color)
 % Experts
-b3 = bar(3, nanmean(snr(group == 3)), 'FaceColor', a_color, 'EdgeColor', a_color, 'FaceAlpha', alphablend);
+b3 = bar(3, nanmean(snr(group == 3)), 'FaceColor', a_color, 'EdgeColor', a_color, 'FaceAlpha', .2);
 plot([3 3], [nanmean(snr(group == 3)) - nanstd(snr(group == 3)) nanmean(snr(group == 3)) + nanstd(snr(group == 3))], 'Color', a_color)
 
 % xaxis
@@ -180,12 +181,13 @@ xax.FontName = fontname;
 xax.FontSize = fontsize;
 
 % yaxis
+ylim_lo = 0; ylim_hi = 45;
 yax = get(gca,'yaxis');
 yax.Limits = [ylim_lo ylim_hi];
-yax.TickValues = [ylim_lo (ylim_lo+ylim_hi)/2 ylim_hi];
+yax.TickValues = [5 15 25 35 45];
 yax.TickDirection = 'out';
 yax.TickLength = [xticklength xticklength];
-yax.TickLabels = {num2str(ylim_lo, '%1.0f'), '', num2str(ylim_hi, '%1.0f')};
+xlabels = {'5', '15', '25', '35', '45'};
 yax.FontName = fontname;
 yax.FontSize = fontsize;
 yax.FontAngle = fontangle;
@@ -200,8 +202,8 @@ a.YLabel.String = 'SNR, b0 volumes';
 a.YLabel.FontSize = fontsize;
 pbaspect([1 1 1])
 
-print(fullfile(rootDir, 'plots', 'plot_barplot_snr_b0_bygroup'), '-dpng')
-print(fullfile(rootDir, 'plots', 'eps', 'plot_barplot_snr_b0_bygroup'), '-depsc')
+print(fullfile(rootdir, 'plots', 'plot_barplot_snr_b0_bygroup'), '-dpng')
+print(fullfile(rootdir, 'plots', 'eps', 'plot_barplot_snr_b0_bygroup'), '-depsc')
 
 hold off;
 clear snr
@@ -234,12 +236,13 @@ xax.FontName = fontname;
 xax.FontSize = fontsize;
 
 % yaxis
+ylim_lo = 0; ylim_hi = 45;
 yax = get(gca,'yaxis');
 yax.Limits = [ylim_lo ylim_hi];
-yax.TickValues = [ylim_lo (ylim_lo+ylim_hi)/2 ylim_hi];
+yax.TickValues = [5 15 25 35 45];
 yax.TickDirection = 'out';
 yax.TickLength = [xticklength xticklength];
-yax.TickLabels = {num2str(ylim_lo, '%1.0f'), '', num2str(ylim_hi, '%1.0f')};
+xlabels = {'5', '15', '25', '35', '45'};
 yax.FontName = fontname;
 yax.FontSize = fontsize;
 yax.FontAngle = fontangle;
@@ -254,8 +257,8 @@ a.YLabel.String = 'SNR, weighted volumes';
 a.YLabel.FontSize = fontsize;
 pbaspect([1 1 1])
 
-print(fullfile(rootDir, 'plots', 'plot_barplot_snr_weighted_bygroup'), '-dpng')
-print(fullfile(rootDir, 'plots', 'eps', 'plot_barplot_snr_weighted_bygroup'), '-depsc')
+print(fullfile(rootdir, 'plots', 'plot_barplot_snr_weighted_bygroup'), '-dpng')
+print(fullfile(rootdir, 'plots', 'eps', 'plot_barplot_snr_weighted_bygroup'), '-depsc')
 
 hold off;
 

@@ -59,6 +59,7 @@ d.Properties.VariableNames = strrep(d.Properties.VariableNames, '&', '');
 
 % Make things easier.
 d.assoc = d.task1_acc_dirperf4;
+%d.assoc = mean([d.task1_acc_dirperf1 d.task1_acc_dirperf2 d.task1_acc_dirperf3 d.task1_acc_dirperf4], 2);
 d.infer = d.task1_acc_ACperf;
 
 % Tell Matlab that sex and age group are categorical variables.
@@ -229,102 +230,102 @@ hold off;
 % 
 % hold off;
 % 
-%% Task 4: Relational Reasoning
-% Remove data identified as outliers by Schlichting et al., 2017. 
-temp = load(fullfile(rootdir, 'taskperf', 'task4_behavior_n=78.mat'));
-removetemp1 = temp.subnumbers(find(temp.includeBoolPerf == 0));
-removetemp2 = temp.subnumbers(find(temp.includeBoolRT == 0));
-removesubid = unique([removetemp1 removetemp2]);
-clear temp removetemp1 removetemp2;
-d2 = d(~ismember(d.subID, removesubid), :); clear temp;
-
-if strcmp(accuracycutoff, 'yes')
-    d2.task4_rel0acc(d2.task4_rel0acc < .33) = NaN;
-    d2.task4_rel1acc(d2.task4_rel1acc < .33) = NaN;
-    d2.task4_rel2acc(d2.task4_rel2acc < .33) = NaN;
-end
-
-m1 = nanmean(d2.task4_rel0acc(find(d2.group == 1))); n1 = length(d2.task4_rel0acc(find(d2.group == 1))); sem1 = 1.96*(nanstd(d2.task4_rel0acc(find(d2.group == 1)))/sqrt(n1));
-m2 = nanmean(d2.task4_rel1acc(find(d2.group == 1))); n2 = length(d2.task4_rel1acc(find(d2.group == 1))); sem2 = 1.96*(nanstd(d2.task4_rel1acc(find(d2.group == 1)))/sqrt(n2));
-m3 = nanmean(d2.task4_rel2acc(find(d2.group == 1))); n3 = length(d2.task4_rel2acc(find(d2.group == 1))); sem3 = 1.96*(nanstd(d2.task4_rel2acc(find(d2.group == 1)))/sqrt(n3));
-
-m4 = nanmean(d2.task4_rel0acc(find(d2.group == 2))); n4 = length(d2.task4_rel0acc(find(d2.group == 2))); sem4 = 1.96*(nanstd(d2.task4_rel0acc(find(d2.group == 2)))/sqrt(n4));
-m5 = nanmean(d2.task4_rel1acc(find(d2.group == 2))); n5 = length(d2.task4_rel1acc(find(d2.group == 2))); sem5 = 1.96*(nanstd(d2.task4_rel1acc(find(d2.group == 2)))/sqrt(n5));
-m6 = nanmean(d2.task4_rel2acc(find(d2.group == 2))); n6 = length(d2.task4_rel2acc(find(d2.group == 2))); sem6 = 1.96*(nanstd(d2.task4_rel2acc(find(d2.group == 2)))/sqrt(n6));
-
-m7 = nanmean(d2.task4_rel0acc(find(d2.group == 3))); n7 = length(d2.task4_rel0acc(find(d2.group == 3))); sem7 = 1.96*(nanstd(d2.task4_rel0acc(find(d2.group == 3)))/sqrt(n7));
-m8 = nanmean(d2.task4_rel1acc(find(d2.group == 3))); n8 = length(d2.task4_rel1acc(find(d2.group == 3))); sem8 = 1.96*(nanstd(d2.task4_rel1acc(find(d2.group == 3)))/sqrt(n8));
-m9 = nanmean(d2.task4_rel2acc(find(d2.group == 3))); n9 = length(d2.task4_rel2acc(find(d2.group == 3))); sem9 = 1.96*(nanstd(d2.task4_rel2acc(find(d2.group == 3)))/sqrt(n9));
-
-figure(3); hold on;
-b = bar([1], [m1]); color = [50 180 100]/255; b.FaceColor = color; b.EdgeColor = 'none'; barwidth = 0.8; b.BarWidth = barwidth; b.FaceAlpha = 1;
-b = bar([2], [m2]); color = [50 180 100]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.5;
-b = bar([3], [m3]); color = [50 180 100]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.15;
-
-b = bar([5], [m4]); color = [50 100 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 1;
-b = bar([6], [m5]); color = [50 100 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.3;
-b = bar([7], [m6]); color = [50 100 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.15;
-
-b = bar([9], [m7]); color = [100 50 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 1;
-b = bar([10], [m8]); color = [100 50 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.5;
-b = bar([11], [m9]); color = [100 50 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.15;
-
-p = plot([1 1], [m1+sem1 m1-sem1]); p(1).Color = 'k';
-p = plot([2 2], [m2+sem2 m2-sem2]); p(1).Color = 'k';
-p = plot([3 3], [m3+sem3 m3-sem3]); p(1).Color = 'k';
-
-p = plot([5 5], [m4+sem4 m4-sem4]); p(1).Color = 'k';
-p = plot([6 6], [m5+sem5 m5-sem5]); p(1).Color = 'k';
-p = plot([7 7], [m6+sem6 m6-sem6]); p(1).Color = 'k';
-
-p = plot([9 9], [m7+sem7 m7-sem7]); p(1).Color = 'k';
-p = plot([10 10], [m8+sem8 m8-sem8]); p(1).Color = 'k';
-p = plot([11 11], [m9+sem9 m9-sem9]); p(1).Color = 'k';
-
-plot([0 12], [0.33 0.33], 'k:');
-
-% xaxis
-xax = get(gca, 'xaxis');
-xax.Limits = [0 12];
-xax.TickValues = [2 6 10];
-xax.TickDirection = 'out';
-xax.TickLength = [yticklength yticklength];
-xlabels = {['child, N=' num2str(n1)], ['adol., N=' num2str(n4)], ['adult, N=' num2str(n7)]};
-xlabels = cellfun(@(x) strrep(x, ',', '\newline'), xlabels, 'UniformOutput', false);
-xax.TickLabels = xlabels;
-xax.FontName = fontname;
-xax.FontSize = fontsize;
-
-% yaxis
-ylim_lo = 0.7; ylim_hi = 1;
-yax = get(gca,'yaxis');
-yax.Limits = [ylim_lo ylim_hi];
-yax.TickValues = [0.7 0.845 1];
-yax.TickDirection = 'out';
-yax.TickLength = [xticklength xticklength];
-yax.TickLabels = {num2str(ylim_lo, '%1.2f'), num2str((ylim_lo+ylim_hi)/2, '%1.2f'), num2str(ylim_hi, '%1.2f')};
-yax.FontName = fontname;
-yax.FontSize = fontsize;
-yax.FontAngle = fontangle;
-
-ylabel('Accuracy (proportion correct)', 'FontAngle', 'italic')
-   
-% legend off;
-legend({'Rel 0', 'Rel 1', 'Rel 2'})
-box off; 
-legend('box', 'off');
-legend('location', 'eastoutside');
-pbaspect([1 1 1])
-
-print(fullfile(rootdir, 'plots', 'devti_relationalreasoning_acc'), '-dpng')
-print(fullfile(rootdir, 'plots', 'eps', 'devti_relationalreasoning_acc'), '-depsc')
-
-[H, P, CI, stats] = ttest2(d2.task4_rel0acc(find(d2.group == 1)), d2.task4_rel0acc(find(d2.group == 2)))
-[H, P, CI, stats] = ttest2(d2.task4_rel1acc(find(d2.group == 1)), d2.task4_rel1acc(find(d2.group == 2)))
-[H, P, CI, stats] = ttest2(d2.task4_rel2acc(find(d2.group == 1)), d2.task4_rel2acc(find(d2.group == 2)))
-[H, P, CI, stats] = ttest2(d2.task4_rel2acc(find(d2.group == 2)), d2.task4_rel2acc(find(d2.group == 3)))
-
-hold off;
+% %% Task 4: Relational Reasoning
+% % Remove data identified as outliers by Schlichting et al., 2017. 
+% temp = load(fullfile(rootdir, 'taskperf', 'task4_behavior_n=78.mat'));
+% removetemp1 = temp.subnumbers(find(temp.includeBoolPerf == 0));
+% removetemp2 = temp.subnumbers(find(temp.includeBoolRT == 0));
+% removesubid = unique([removetemp1 removetemp2]);
+% clear temp removetemp1 removetemp2;
+% d2 = d(~ismember(d.subID, removesubid), :); clear temp;
+% 
+% if strcmp(accuracycutoff, 'yes')
+%     d2.task4_rel0acc(d2.task4_rel0acc < .33) = NaN;
+%     d2.task4_rel1acc(d2.task4_rel1acc < .33) = NaN;
+%     d2.task4_rel2acc(d2.task4_rel2acc < .33) = NaN;
+% end
+% 
+% m1 = nanmean(d2.task4_rel0acc(find(d2.group == 1))); n1 = length(d2.task4_rel0acc(find(d2.group == 1))); sem1 = 1.96*(nanstd(d2.task4_rel0acc(find(d2.group == 1)))/sqrt(n1));
+% m2 = nanmean(d2.task4_rel1acc(find(d2.group == 1))); n2 = length(d2.task4_rel1acc(find(d2.group == 1))); sem2 = 1.96*(nanstd(d2.task4_rel1acc(find(d2.group == 1)))/sqrt(n2));
+% m3 = nanmean(d2.task4_rel2acc(find(d2.group == 1))); n3 = length(d2.task4_rel2acc(find(d2.group == 1))); sem3 = 1.96*(nanstd(d2.task4_rel2acc(find(d2.group == 1)))/sqrt(n3));
+% 
+% m4 = nanmean(d2.task4_rel0acc(find(d2.group == 2))); n4 = length(d2.task4_rel0acc(find(d2.group == 2))); sem4 = 1.96*(nanstd(d2.task4_rel0acc(find(d2.group == 2)))/sqrt(n4));
+% m5 = nanmean(d2.task4_rel1acc(find(d2.group == 2))); n5 = length(d2.task4_rel1acc(find(d2.group == 2))); sem5 = 1.96*(nanstd(d2.task4_rel1acc(find(d2.group == 2)))/sqrt(n5));
+% m6 = nanmean(d2.task4_rel2acc(find(d2.group == 2))); n6 = length(d2.task4_rel2acc(find(d2.group == 2))); sem6 = 1.96*(nanstd(d2.task4_rel2acc(find(d2.group == 2)))/sqrt(n6));
+% 
+% m7 = nanmean(d2.task4_rel0acc(find(d2.group == 3))); n7 = length(d2.task4_rel0acc(find(d2.group == 3))); sem7 = 1.96*(nanstd(d2.task4_rel0acc(find(d2.group == 3)))/sqrt(n7));
+% m8 = nanmean(d2.task4_rel1acc(find(d2.group == 3))); n8 = length(d2.task4_rel1acc(find(d2.group == 3))); sem8 = 1.96*(nanstd(d2.task4_rel1acc(find(d2.group == 3)))/sqrt(n8));
+% m9 = nanmean(d2.task4_rel2acc(find(d2.group == 3))); n9 = length(d2.task4_rel2acc(find(d2.group == 3))); sem9 = 1.96*(nanstd(d2.task4_rel2acc(find(d2.group == 3)))/sqrt(n9));
+% 
+% figure(3); hold on;
+% b = bar([1], [m1]); color = [50 180 100]/255; b.FaceColor = color; b.EdgeColor = 'none'; barwidth = 0.8; b.BarWidth = barwidth; b.FaceAlpha = 1;
+% b = bar([2], [m2]); color = [50 180 100]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.5;
+% b = bar([3], [m3]); color = [50 180 100]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.15;
+% 
+% b = bar([5], [m4]); color = [50 100 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 1;
+% b = bar([6], [m5]); color = [50 100 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.3;
+% b = bar([7], [m6]); color = [50 100 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.15;
+% 
+% b = bar([9], [m7]); color = [100 50 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 1;
+% b = bar([10], [m8]); color = [100 50 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.5;
+% b = bar([11], [m9]); color = [100 50 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.15;
+% 
+% p = plot([1 1], [m1+sem1 m1-sem1]); p(1).Color = 'k';
+% p = plot([2 2], [m2+sem2 m2-sem2]); p(1).Color = 'k';
+% p = plot([3 3], [m3+sem3 m3-sem3]); p(1).Color = 'k';
+% 
+% p = plot([5 5], [m4+sem4 m4-sem4]); p(1).Color = 'k';
+% p = plot([6 6], [m5+sem5 m5-sem5]); p(1).Color = 'k';
+% p = plot([7 7], [m6+sem6 m6-sem6]); p(1).Color = 'k';
+% 
+% p = plot([9 9], [m7+sem7 m7-sem7]); p(1).Color = 'k';
+% p = plot([10 10], [m8+sem8 m8-sem8]); p(1).Color = 'k';
+% p = plot([11 11], [m9+sem9 m9-sem9]); p(1).Color = 'k';
+% 
+% plot([0 12], [0.33 0.33], 'k:');
+% 
+% % xaxis
+% xax = get(gca, 'xaxis');
+% xax.Limits = [0 12];
+% xax.TickValues = [2 6 10];
+% xax.TickDirection = 'out';
+% xax.TickLength = [yticklength yticklength];
+% xlabels = {['child, N=' num2str(n1)], ['adol., N=' num2str(n4)], ['adult, N=' num2str(n7)]};
+% xlabels = cellfun(@(x) strrep(x, ',', '\newline'), xlabels, 'UniformOutput', false);
+% xax.TickLabels = xlabels;
+% xax.FontName = fontname;
+% xax.FontSize = fontsize;
+% 
+% % yaxis
+% ylim_lo = 0.7; ylim_hi = 1;
+% yax = get(gca,'yaxis');
+% yax.Limits = [ylim_lo ylim_hi];
+% yax.TickValues = [0.7 0.845 1];
+% yax.TickDirection = 'out';
+% yax.TickLength = [xticklength xticklength];
+% yax.TickLabels = {num2str(ylim_lo, '%1.2f'), num2str((ylim_lo+ylim_hi)/2, '%1.2f'), num2str(ylim_hi, '%1.2f')};
+% yax.FontName = fontname;
+% yax.FontSize = fontsize;
+% yax.FontAngle = fontangle;
+% 
+% ylabel('Accuracy (proportion correct)', 'FontAngle', 'italic')
+%    
+% % legend off;
+% legend({'Rel 0', 'Rel 1', 'Rel 2'})
+% box off; 
+% legend('box', 'off');
+% legend('location', 'eastoutside');
+% pbaspect([1 1 1])
+% 
+% print(fullfile(rootdir, 'plots', 'devti_relationalreasoning_acc'), '-dpng')
+% print(fullfile(rootdir, 'plots', 'eps', 'devti_relationalreasoning_acc'), '-depsc')
+% 
+% [H, P, CI, stats] = ttest2(d2.task4_rel0acc(find(d2.group == 1)), d2.task4_rel0acc(find(d2.group == 2)))
+% [H, P, CI, stats] = ttest2(d2.task4_rel1acc(find(d2.group == 1)), d2.task4_rel1acc(find(d2.group == 2)))
+% [H, P, CI, stats] = ttest2(d2.task4_rel2acc(find(d2.group == 1)), d2.task4_rel2acc(find(d2.group == 2)))
+% [H, P, CI, stats] = ttest2(d2.task4_rel2acc(find(d2.group == 2)), d2.task4_rel2acc(find(d2.group == 3)))
+% 
+% hold off;
 
 % %% Task 5: Relational Inference
 % Remove data identified as outliers by Schlichting et al., 2017. 
@@ -658,212 +659,212 @@ hold off;
 [H, P, CI, stats] = ttest(d2.assocrt(find(d2.group == 2)), d2.inferrt(find(d2.group == 2)))
 [H, P, CI, stats] = ttest(d2.assocrt(find(d2.group == 3)), d2.inferrt(find(d2.group == 3)))
 
-%% Task 4: Relational Reasoning
-% Remove data identified as outliers by Schlichting et al., 2017. 
-temp = load(fullfile(rootdir, 'taskperf', 'task4_behavior_n=78.mat'));
-removetemp1 = temp.subnumbers(find(temp.includeBoolPerf == 0));
-removetemp2 = temp.subnumbers(find(temp.includeBoolRT == 0));
-removesubid = unique([removetemp1 removetemp2]);
-clear temp removetemp1 removetemp2;
-d2 = d(~ismember(d.subID, removesubid), :); clear temp;
-
-if strcmp(accuracycutoff, 'yes')
-    d2.task4_rel0rt(d2.task4_rel0acc < .33) = NaN;
-    d2.task4_rel1rt(d2.task4_rel1acc < .33) = NaN;
-    d2.task4_rel2rt(d2.task4_rel2acc < .33) = NaN;
-end
-
-m1 = nanmean(d2.task4_rel0rt(find(d2.group == 1))); n1 = length(d2.task4_rel0rt(find(d2.group == 1))); sem1 = 1.96*(nanstd(d2.task4_rel0rt(find(d2.group == 1)))/sqrt(n1));
-m2 = nanmean(d2.task4_rel1rt(find(d2.group == 1))); n2 = length(d2.task4_rel1rt(find(d2.group == 1))); sem2 = 1.96*(nanstd(d2.task4_rel1rt(find(d2.group == 1)))/sqrt(n2));
-m3 = nanmean(d2.task4_rel2rt(find(d2.group == 1))); n3 = length(d2.task4_rel2rt(find(d2.group == 1))); sem3 = 1.96*(nanstd(d2.task4_rel2rt(find(d2.group == 1)))/sqrt(n3));
-
-m4 = nanmean(d2.task4_rel0rt(find(d2.group == 2))); n4 = length(d2.task4_rel0rt(find(d2.group == 2))); sem4 = 1.96*(nanstd(d2.task4_rel0rt(find(d2.group == 2)))/sqrt(n4));
-m5 = nanmean(d2.task4_rel1rt(find(d2.group == 2))); n5 = length(d2.task4_rel1rt(find(d2.group == 2))); sem5 = 1.96*(nanstd(d2.task4_rel1rt(find(d2.group == 2)))/sqrt(n5));
-m6 = nanmean(d2.task4_rel2rt(find(d2.group == 2))); n6 = length(d2.task4_rel2rt(find(d2.group == 2))); sem6 = 1.96*(nanstd(d2.task4_rel2rt(find(d2.group == 2)))/sqrt(n6));
-
-m7 = nanmean(d2.task4_rel0rt(find(d2.group == 3))); n7 = length(d2.task4_rel0rt(find(d2.group == 3))); sem7 = 1.96*(nanstd(d2.task4_rel0rt(find(d2.group == 3)))/sqrt(n7));
-m8 = nanmean(d2.task4_rel1rt(find(d2.group == 3))); n8 = length(d2.task4_rel1rt(find(d2.group == 3))); sem8 = 1.96*(nanstd(d2.task4_rel1rt(find(d2.group == 3)))/sqrt(n8));
-m9 = nanmean(d2.task4_rel2rt(find(d2.group == 3))); n9 = length(d2.task4_rel2rt(find(d2.group == 3))); sem9 = 1.96*(nanstd(d2.task4_rel2rt(find(d2.group == 3)))/sqrt(n9));
-
-figure(9); hold on;
-b = bar([1], [m1]); color = [50 180 100]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 1;
-b = bar([2], [m2]); color = [50 180 100]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.5;
-b = bar([3], [m3]); color = [50 180 100]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.15;
-
-b = bar([5], [m4]); color = [50 100 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 1;
-b = bar([6], [m5]); color = [50 100 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.3;
-b = bar([7], [m6]); color = [50 100 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.15;
-
-b = bar([9], [m7]); color = [100 50 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 1;
-b = bar([10], [m8]); color = [100 50 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.5;
-b = bar([11], [m9]); color = [100 50 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.15;
-
-p = plot([1 1], [m1+sem1 m1-sem1]); p(1).Color = 'k';
-p = plot([2 2], [m2+sem2 m2-sem2]); p(1).Color = 'k';
-p = plot([3 3], [m3+sem3 m3-sem3]); p(1).Color = 'k';
-
-p = plot([5 5], [m4+sem4 m4-sem4]); p(1).Color = 'k';
-p = plot([6 6], [m5+sem5 m5-sem5]); p(1).Color = 'k';
-p = plot([7 7], [m6+sem6 m6-sem6]); p(1).Color = 'k';
-
-p = plot([9 9], [m7+sem7 m7-sem7]); p(1).Color = 'k';
-p = plot([10 10], [m8+sem8 m8-sem8]); p(1).Color = 'k';
-p = plot([11 11], [m9+sem9 m9-sem9]); p(1).Color = 'k';
-
-% plot([0 12], [0.33 0.33], 'k:');
-
-% xaxis
-xax = get(gca, 'xaxis');
-xax.Limits = [0 12];
-xax.TickValues = [2 6 10];
-xax.TickDirection = 'out';
-xax.TickLength = [yticklength yticklength];
-xlabels = {['child, N=' num2str(n1)], ['adol., N=' num2str(n4)], ['adult, N=' num2str(n7)]};
-xlabels = cellfun(@(x) strrep(x, ',', '\newline'), xlabels, 'UniformOutput', false);
-xax.TickLabels = xlabels;
-xax.FontName = fontname;
-xax.FontSize = fontsize;
-
-% yaxis
-ylim_lo = 0; ylim_hi = 6000;
-yax = get(gca,'yaxis');
-yax.Limits = [ylim_lo ylim_hi];
-yax.TickValues = [0 3000 6000];
-yax.TickDirection = 'out';
-yax.TickLength = [xticklength xticklength];
-yax.TickLabels = {num2str(ylim_lo, '%1.0f'), num2str((ylim_lo+ylim_hi)/2, '%1.0f'), num2str(ylim_hi, '%1.0f')};
-yax.FontName = fontname;
-yax.FontSize = fontsize;
-yax.FontAngle = fontangle;
-
-ylabel('Reaction Time (ms)', 'FontAngle', 'italic')
-   
-% legend off;
-legend({'Rel 0', 'Rel 1', 'Rel 2'})
-box off; 
-legend('box', 'off');
-legend('location', 'eastoutside');
-pbaspect([1 1 1])
-
-print(fullfile(rootdir, 'plots', 'devti_relationalreasoning_rt'), '-dpng')
-print(fullfile(rootdir, 'plots', 'eps', 'devti_relationalreasoning_rt'), '-depsc')
-
-hold off;
-
-figure(10); hold on;
-m1 = nanmean(d2.task4_rel0rt); n1 = length(d2.task4_rel0rt); sem1 = 1.96*(nanstd(d2.task4_rel0rt)/sqrt(n1));
-m2 = nanmean(d2.task4_rel1rt); n2 = length(d2.task4_rel1rt); sem2 = 1.96*(nanstd(d2.task4_rel1rt)/sqrt(n2));
-m3 = nanmean(d2.task4_rel2rt); n3 = length(d2.task4_rel2rt); sem3 = 1.96*(nanstd(d2.task4_rel2rt)/sqrt(n3));
-
-figure(10); hold on;
-b = bar([1], [m1]); color = [128 128 128]/255; b.FaceColor = color; b.EdgeColor = 'none'; barwidth = 0.8; b.BarWidth = barwidth; b.FaceAlpha = 1;
-b = bar([2], [m2]); color = [128 128 128]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.5;
-b = bar([3], [m3]); color = [128 128 128]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.15;
-
-p = plot([1 1], [m1+sem1 m1-sem1]); p(1).Color = 'k';
-p = plot([2 2], [m2+sem2 m2-sem2]); p(1).Color = 'k';
-p = plot([3 3], [m3+sem3 m3-sem3]); p(1).Color = 'k';
-
-% plot([0 12], [0.33 0.33], 'k:');
-
-% xaxis
-xax = get(gca, 'xaxis');
-xax.Limits = [0 4];
-xax.TickValues = [1 2 3];
-xax.TickDirection = 'out';
-xax.TickLength = [yticklength yticklength];
-xlabels = {['Rel-0, N=' num2str(n1)], ['Rel-1, N=' num2str(n2)], ['Rel-2, N=' num2str(n3)]};
-xlabels = cellfun(@(x) strrep(x, ',', '\newline'), xlabels, 'UniformOutput', false);
-xax.TickLabels = xlabels;
-xax.FontName = fontname;
-xax.FontSize = fontsize;
-
-% yaxis
-ylim_lo = 0; ylim_hi = 6000;
-yax = get(gca,'yaxis');
-yax.Limits = [ylim_lo ylim_hi];
-yax.TickValues = [0 3000 6000];
-yax.TickDirection = 'out';
-yax.TickLength = [xticklength xticklength];
-yax.TickLabels = {num2str(ylim_lo, '%1.0f'), num2str((ylim_lo+ylim_hi)/2, '%1.0f'), num2str(ylim_hi, '%1.0f')};
-yax.FontName = fontname;
-yax.FontSize = fontsize;
-yax.FontAngle = fontangle;
-
-ylabel('Reaction Time (ms)', 'FontAngle', 'italic')
-   
-% legend off;
-legend({'Rel-0', 'Rel-1', 'Rel-2'})
-box off; 
-legend('box', 'off');
-legend('location', 'eastoutside');
-pbaspect([2 1 2])
-
-print(fullfile(rootdir, 'plots', 'devti_relationalreasoning_rt_maineffectoftask'), '-dpng')
-print(fullfile(rootdir, 'plots', 'eps', 'devti_relationalreasoning_rt_maineffectoftask'), '-depsc')
-
-hold off;
-
-[H, P, CI, stats] = ttest2(d2.task4_rel2rt(find(d2.group == 1)), d2.task4_rel2rt(find(d2.group == 2)))
-
-figure(10); hold on;
-vec = [d2.task4_rel0rt(find(d2.group == 1)); d2.task4_rel1rt(find(d2.group == 1)); d2.task4_rel2rt(find(d2.group == 1))];
-m1 = nanmean(vec); n1 = length(vec)/3; sem1 = 1.96*(nanstd(vec)/sqrt(n1));
-
-vec = [d2.task4_rel0rt(find(d2.group == 2)); d2.task4_rel1rt(find(d2.group == 2)); d2.task4_rel2rt(find(d2.group == 2))];
-m2 = nanmean(vec); n2 = length(vec)/3; sem2 = 1.96*(nanstd(vec)/sqrt(n2));
-
-vec = [d2.task4_rel0rt(find(d2.group == 3)); d2.task4_rel1rt(find(d2.group == 3)); d2.task4_rel2rt(find(d2.group == 3))];
-m3 = nanmean(vec); n3 = length(vec)/3; sem3 = 1.96*(nanstd(vec)/sqrt(n3));
-
-figure(11); hold on;
-b = bar([1], [m1]); color = [50 180 100]/255; b.FaceColor = color; b.EdgeColor = 'none'; barwidth = 0.8; b.BarWidth = barwidth; b.FaceAlpha = 1;
-b = bar([2], [m2]); color = [50 100 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 1;
-b = bar([3], [m3]); color = [100 50 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 1;
-
-p = plot([1 1], [m1+sem1 m1-sem1]); p(1).Color = 'k';
-p = plot([2 2], [m2+sem2 m2-sem2]); p(1).Color = 'k';
-p = plot([3 3], [m3+sem3 m3-sem3]); p(1).Color = 'k';
-
-% plot([0 12], [0.33 0.33], 'k:');
-
-% xaxis
-xax = get(gca, 'xaxis');
-xax.Limits = [0 4];
-xax.TickValues = [1 2 3];
-xax.TickDirection = 'out';
-xax.TickLength = [yticklength yticklength];
-xlabels = {['child, N=' num2str(n1)], ['adol., N=' num2str(n2)], ['adult, N=' num2str(n3)]};
-xlabels = cellfun(@(x) strrep(x, ',', '\newline'), xlabels, 'UniformOutput', false);
-xax.TickLabels = xlabels;
-xax.FontName = fontname;
-xax.FontSize = fontsize;
-
-% yaxis
-ylim_lo = 0; ylim_hi = 6000;
-yax = get(gca,'yaxis');
-yax.Limits = [ylim_lo ylim_hi];
-yax.TickValues = [0 3000 6000];
-yax.TickDirection = 'out';
-yax.TickLength = [xticklength xticklength];
-yax.TickLabels = {num2str(ylim_lo, '%1.0f'), num2str((ylim_lo+ylim_hi)/2, '%1.0f'), num2str(ylim_hi, '%1.0f')};
-yax.FontName = fontname;
-yax.FontSize = fontsize;
-yax.FontAngle = fontangle;
-
-ylabel('Reaction Time (ms)', 'FontAngle', 'italic')
-   
-legend off;
-% legend({'Rel-0', 'Rel-1', 'Rel-2'})
-box off; 
+% %% Task 4: Relational Reasoning
+% % Remove data identified as outliers by Schlichting et al., 2017. 
+% temp = load(fullfile(rootdir, 'taskperf', 'task4_behavior_n=78.mat'));
+% removetemp1 = temp.subnumbers(find(temp.includeBoolPerf == 0));
+% removetemp2 = temp.subnumbers(find(temp.includeBoolRT == 0));
+% removesubid = unique([removetemp1 removetemp2]);
+% clear temp removetemp1 removetemp2;
+% d2 = d(~ismember(d.subID, removesubid), :); clear temp;
+% 
+% if strcmp(accuracycutoff, 'yes')
+%     d2.task4_rel0rt(d2.task4_rel0acc < .33) = NaN;
+%     d2.task4_rel1rt(d2.task4_rel1acc < .33) = NaN;
+%     d2.task4_rel2rt(d2.task4_rel2acc < .33) = NaN;
+% end
+% 
+% m1 = nanmean(d2.task4_rel0rt(find(d2.group == 1))); n1 = length(d2.task4_rel0rt(find(d2.group == 1))); sem1 = 1.96*(nanstd(d2.task4_rel0rt(find(d2.group == 1)))/sqrt(n1));
+% m2 = nanmean(d2.task4_rel1rt(find(d2.group == 1))); n2 = length(d2.task4_rel1rt(find(d2.group == 1))); sem2 = 1.96*(nanstd(d2.task4_rel1rt(find(d2.group == 1)))/sqrt(n2));
+% m3 = nanmean(d2.task4_rel2rt(find(d2.group == 1))); n3 = length(d2.task4_rel2rt(find(d2.group == 1))); sem3 = 1.96*(nanstd(d2.task4_rel2rt(find(d2.group == 1)))/sqrt(n3));
+% 
+% m4 = nanmean(d2.task4_rel0rt(find(d2.group == 2))); n4 = length(d2.task4_rel0rt(find(d2.group == 2))); sem4 = 1.96*(nanstd(d2.task4_rel0rt(find(d2.group == 2)))/sqrt(n4));
+% m5 = nanmean(d2.task4_rel1rt(find(d2.group == 2))); n5 = length(d2.task4_rel1rt(find(d2.group == 2))); sem5 = 1.96*(nanstd(d2.task4_rel1rt(find(d2.group == 2)))/sqrt(n5));
+% m6 = nanmean(d2.task4_rel2rt(find(d2.group == 2))); n6 = length(d2.task4_rel2rt(find(d2.group == 2))); sem6 = 1.96*(nanstd(d2.task4_rel2rt(find(d2.group == 2)))/sqrt(n6));
+% 
+% m7 = nanmean(d2.task4_rel0rt(find(d2.group == 3))); n7 = length(d2.task4_rel0rt(find(d2.group == 3))); sem7 = 1.96*(nanstd(d2.task4_rel0rt(find(d2.group == 3)))/sqrt(n7));
+% m8 = nanmean(d2.task4_rel1rt(find(d2.group == 3))); n8 = length(d2.task4_rel1rt(find(d2.group == 3))); sem8 = 1.96*(nanstd(d2.task4_rel1rt(find(d2.group == 3)))/sqrt(n8));
+% m9 = nanmean(d2.task4_rel2rt(find(d2.group == 3))); n9 = length(d2.task4_rel2rt(find(d2.group == 3))); sem9 = 1.96*(nanstd(d2.task4_rel2rt(find(d2.group == 3)))/sqrt(n9));
+% 
+% figure(9); hold on;
+% b = bar([1], [m1]); color = [50 180 100]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 1;
+% b = bar([2], [m2]); color = [50 180 100]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.5;
+% b = bar([3], [m3]); color = [50 180 100]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.15;
+% 
+% b = bar([5], [m4]); color = [50 100 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 1;
+% b = bar([6], [m5]); color = [50 100 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.3;
+% b = bar([7], [m6]); color = [50 100 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.15;
+% 
+% b = bar([9], [m7]); color = [100 50 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 1;
+% b = bar([10], [m8]); color = [100 50 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.5;
+% b = bar([11], [m9]); color = [100 50 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.15;
+% 
+% p = plot([1 1], [m1+sem1 m1-sem1]); p(1).Color = 'k';
+% p = plot([2 2], [m2+sem2 m2-sem2]); p(1).Color = 'k';
+% p = plot([3 3], [m3+sem3 m3-sem3]); p(1).Color = 'k';
+% 
+% p = plot([5 5], [m4+sem4 m4-sem4]); p(1).Color = 'k';
+% p = plot([6 6], [m5+sem5 m5-sem5]); p(1).Color = 'k';
+% p = plot([7 7], [m6+sem6 m6-sem6]); p(1).Color = 'k';
+% 
+% p = plot([9 9], [m7+sem7 m7-sem7]); p(1).Color = 'k';
+% p = plot([10 10], [m8+sem8 m8-sem8]); p(1).Color = 'k';
+% p = plot([11 11], [m9+sem9 m9-sem9]); p(1).Color = 'k';
+% 
+% % plot([0 12], [0.33 0.33], 'k:');
+% 
+% % xaxis
+% xax = get(gca, 'xaxis');
+% xax.Limits = [0 12];
+% xax.TickValues = [2 6 10];
+% xax.TickDirection = 'out';
+% xax.TickLength = [yticklength yticklength];
+% xlabels = {['child, N=' num2str(n1)], ['adol., N=' num2str(n4)], ['adult, N=' num2str(n7)]};
+% xlabels = cellfun(@(x) strrep(x, ',', '\newline'), xlabels, 'UniformOutput', false);
+% xax.TickLabels = xlabels;
+% xax.FontName = fontname;
+% xax.FontSize = fontsize;
+% 
+% % yaxis
+% ylim_lo = 0; ylim_hi = 6000;
+% yax = get(gca,'yaxis');
+% yax.Limits = [ylim_lo ylim_hi];
+% yax.TickValues = [0 3000 6000];
+% yax.TickDirection = 'out';
+% yax.TickLength = [xticklength xticklength];
+% yax.TickLabels = {num2str(ylim_lo, '%1.0f'), num2str((ylim_lo+ylim_hi)/2, '%1.0f'), num2str(ylim_hi, '%1.0f')};
+% yax.FontName = fontname;
+% yax.FontSize = fontsize;
+% yax.FontAngle = fontangle;
+% 
+% ylabel('Reaction Time (ms)', 'FontAngle', 'italic')
+%    
+% % legend off;
+% legend({'Rel 0', 'Rel 1', 'Rel 2'})
+% box off; 
 % legend('box', 'off');
 % legend('location', 'eastoutside');
-pbaspect([2 1 2])
-
-print(fullfile(rootdir, 'plots', 'devti_relationalreasoning_rt_maineffectofgroup'), '-dpng')
-print(fullfile(rootdir, 'plots', 'eps', 'devti_relationalreasoning_rt_maineffectofgroup'), '-depsc')
-
-hold off;
+% pbaspect([1 1 1])
+% 
+% print(fullfile(rootdir, 'plots', 'devti_relationalreasoning_rt'), '-dpng')
+% print(fullfile(rootdir, 'plots', 'eps', 'devti_relationalreasoning_rt'), '-depsc')
+% 
+% hold off;
+% 
+% figure(10); hold on;
+% m1 = nanmean(d2.task4_rel0rt); n1 = length(d2.task4_rel0rt); sem1 = 1.96*(nanstd(d2.task4_rel0rt)/sqrt(n1));
+% m2 = nanmean(d2.task4_rel1rt); n2 = length(d2.task4_rel1rt); sem2 = 1.96*(nanstd(d2.task4_rel1rt)/sqrt(n2));
+% m3 = nanmean(d2.task4_rel2rt); n3 = length(d2.task4_rel2rt); sem3 = 1.96*(nanstd(d2.task4_rel2rt)/sqrt(n3));
+% 
+% figure(10); hold on;
+% b = bar([1], [m1]); color = [128 128 128]/255; b.FaceColor = color; b.EdgeColor = 'none'; barwidth = 0.8; b.BarWidth = barwidth; b.FaceAlpha = 1;
+% b = bar([2], [m2]); color = [128 128 128]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.5;
+% b = bar([3], [m3]); color = [128 128 128]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 0.15;
+% 
+% p = plot([1 1], [m1+sem1 m1-sem1]); p(1).Color = 'k';
+% p = plot([2 2], [m2+sem2 m2-sem2]); p(1).Color = 'k';
+% p = plot([3 3], [m3+sem3 m3-sem3]); p(1).Color = 'k';
+% 
+% % plot([0 12], [0.33 0.33], 'k:');
+% 
+% % xaxis
+% xax = get(gca, 'xaxis');
+% xax.Limits = [0 4];
+% xax.TickValues = [1 2 3];
+% xax.TickDirection = 'out';
+% xax.TickLength = [yticklength yticklength];
+% xlabels = {['Rel-0, N=' num2str(n1)], ['Rel-1, N=' num2str(n2)], ['Rel-2, N=' num2str(n3)]};
+% xlabels = cellfun(@(x) strrep(x, ',', '\newline'), xlabels, 'UniformOutput', false);
+% xax.TickLabels = xlabels;
+% xax.FontName = fontname;
+% xax.FontSize = fontsize;
+% 
+% % yaxis
+% ylim_lo = 0; ylim_hi = 6000;
+% yax = get(gca,'yaxis');
+% yax.Limits = [ylim_lo ylim_hi];
+% yax.TickValues = [0 3000 6000];
+% yax.TickDirection = 'out';
+% yax.TickLength = [xticklength xticklength];
+% yax.TickLabels = {num2str(ylim_lo, '%1.0f'), num2str((ylim_lo+ylim_hi)/2, '%1.0f'), num2str(ylim_hi, '%1.0f')};
+% yax.FontName = fontname;
+% yax.FontSize = fontsize;
+% yax.FontAngle = fontangle;
+% 
+% ylabel('Reaction Time (ms)', 'FontAngle', 'italic')
+%    
+% % legend off;
+% legend({'Rel-0', 'Rel-1', 'Rel-2'})
+% box off; 
+% legend('box', 'off');
+% legend('location', 'eastoutside');
+% pbaspect([2 1 2])
+% 
+% print(fullfile(rootdir, 'plots', 'devti_relationalreasoning_rt_maineffectoftask'), '-dpng')
+% print(fullfile(rootdir, 'plots', 'eps', 'devti_relationalreasoning_rt_maineffectoftask'), '-depsc')
+% 
+% hold off;
+% 
+% [H, P, CI, stats] = ttest2(d2.task4_rel2rt(find(d2.group == 1)), d2.task4_rel2rt(find(d2.group == 2)))
+% 
+% figure(10); hold on;
+% vec = [d2.task4_rel0rt(find(d2.group == 1)); d2.task4_rel1rt(find(d2.group == 1)); d2.task4_rel2rt(find(d2.group == 1))];
+% m1 = nanmean(vec); n1 = length(vec)/3; sem1 = 1.96*(nanstd(vec)/sqrt(n1));
+% 
+% vec = [d2.task4_rel0rt(find(d2.group == 2)); d2.task4_rel1rt(find(d2.group == 2)); d2.task4_rel2rt(find(d2.group == 2))];
+% m2 = nanmean(vec); n2 = length(vec)/3; sem2 = 1.96*(nanstd(vec)/sqrt(n2));
+% 
+% vec = [d2.task4_rel0rt(find(d2.group == 3)); d2.task4_rel1rt(find(d2.group == 3)); d2.task4_rel2rt(find(d2.group == 3))];
+% m3 = nanmean(vec); n3 = length(vec)/3; sem3 = 1.96*(nanstd(vec)/sqrt(n3));
+% 
+% figure(11); hold on;
+% b = bar([1], [m1]); color = [50 180 100]/255; b.FaceColor = color; b.EdgeColor = 'none'; barwidth = 0.8; b.BarWidth = barwidth; b.FaceAlpha = 1;
+% b = bar([2], [m2]); color = [50 100 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 1;
+% b = bar([3], [m3]); color = [100 50 180]/255; b.FaceColor = color; b.EdgeColor = 'none'; b.BarWidth = barwidth; b.FaceAlpha = 1;
+% 
+% p = plot([1 1], [m1+sem1 m1-sem1]); p(1).Color = 'k';
+% p = plot([2 2], [m2+sem2 m2-sem2]); p(1).Color = 'k';
+% p = plot([3 3], [m3+sem3 m3-sem3]); p(1).Color = 'k';
+% 
+% % plot([0 12], [0.33 0.33], 'k:');
+% 
+% % xaxis
+% xax = get(gca, 'xaxis');
+% xax.Limits = [0 4];
+% xax.TickValues = [1 2 3];
+% xax.TickDirection = 'out';
+% xax.TickLength = [yticklength yticklength];
+% xlabels = {['child, N=' num2str(n1)], ['adol., N=' num2str(n2)], ['adult, N=' num2str(n3)]};
+% xlabels = cellfun(@(x) strrep(x, ',', '\newline'), xlabels, 'UniformOutput', false);
+% xax.TickLabels = xlabels;
+% xax.FontName = fontname;
+% xax.FontSize = fontsize;
+% 
+% % yaxis
+% ylim_lo = 0; ylim_hi = 6000;
+% yax = get(gca,'yaxis');
+% yax.Limits = [ylim_lo ylim_hi];
+% yax.TickValues = [0 3000 6000];
+% yax.TickDirection = 'out';
+% yax.TickLength = [xticklength xticklength];
+% yax.TickLabels = {num2str(ylim_lo, '%1.0f'), num2str((ylim_lo+ylim_hi)/2, '%1.0f'), num2str(ylim_hi, '%1.0f')};
+% yax.FontName = fontname;
+% yax.FontSize = fontsize;
+% yax.FontAngle = fontangle;
+% 
+% ylabel('Reaction Time (ms)', 'FontAngle', 'italic')
+%    
+% legend off;
+% % legend({'Rel-0', 'Rel-1', 'Rel-2'})
+% box off; 
+% % legend('box', 'off');
+% % legend('location', 'eastoutside');
+% pbaspect([2 1 2])
+% 
+% print(fullfile(rootdir, 'plots', 'devti_relationalreasoning_rt_maineffectofgroup'), '-dpng')
+% print(fullfile(rootdir, 'plots', 'eps', 'devti_relationalreasoning_rt_maineffectofgroup'), '-depsc')
+% 
+% hold off;
 
 %% Task 5: Relational Inference
 % Remove data identified as outliers by Schlichting et al., 2017. 
@@ -964,7 +965,7 @@ clear temp removetemp1 removetemp2;
 d2 = d(~ismember(d.subID, removesubid), :); clear temp removesubid;
 
 figure(13); 
-modelspec = 'task1_acc_dirperf4 ~ task1_rt_dirrt4'; 
+modelspec = 'assoc ~ assocrt'; 
 mdl = fitlm(d2, modelspec) %, 'Exclude', find(sum(m.subID == remove, 2)));
 hold on;
 p = plot(mdl);
@@ -1038,7 +1039,7 @@ print(fullfile(rootdir, 'plots', 'eps', ['speedaccuracytradeoff_' modelspec]), '
 hold off;
 
 figure(14); 
-modelspec = 'task1_acc_ACperf ~ task1_rt_ACrt'; 
+modelspec = 'infer ~ inferrt'; 
 mdl = fitlm(d2, modelspec) %, 'Exclude', find(sum(m.subID == remove, 2)));
 hold on;
 p = plot(mdl); 
@@ -1111,235 +1112,235 @@ print(fullfile(rootdir, 'plots', 'eps', ['speedaccuracytradeoff_' modelspec]), '
 
 hold off;
 
-% Task 4
-temp = load(fullfile(rootdir, 'taskperf', 'task4_behavior_n=78.mat'));
-removetemp1 = temp.subnumbers(find(temp.includeBoolPerf == 0));
-removetemp2 = temp.subnumbers(find(temp.includeBoolRT == 0));
-removesubid = unique([removetemp1 removetemp2]);
-clear temp removetemp1 removetemp2;
-d2 = d(~ismember(d.subID, removesubid), :); clear temp removesubid;
-
-figure(15); 
-modelspec = 'task4_rel0acc ~ task4_rel0rt'; 
-mdl = fitlm(d2, modelspec) %, 'Exclude', find(sum(m.subID == remove, 2)));
-hold on;
-p = plot(mdl); 
-
-color = [128 128 128]/255; 
-p(1).Color = color;
-p(1).Marker = 'o';
-p(1).MarkerFaceColor = color;
-p(1).MarkerEdgeColor = [1 1 1];
-p(1).MarkerSize = markersize;
-p(2).Color = color;
-p(2).LineWidth = linewidth;
-p(3).LineStyle = 'none';
-p(4).LineStyle = 'none';
-x = p(2).XData; y = p(2).YData; CI = (p(4).YData - p(3).YData)/2; 
-patch([x fliplr(x)], [y-CI fliplr(y+CI)], color, 'FaceAlpha',0.2, 'EdgeColor','none')
-clear p;
-
-legend off;
-
-a = gca;
-a.YLabel.String = {'Accuracy (proportion correct)'};
-a.YLabel.FontSize = fontsize;
-a.YLabel.FontAngle = fontangle;
-a.XLabel.String = {'Reaction Time (ms)'};
-a.XLabel.FontSize = fontsize;
-% title('Subregion: CA1')
-title('Rel-0')
-a.TitleFontSizeMultiplier = 2;
-
-% xaxis
-xlimlo = 1000; xlimhi = 8000;
-xax = get(gca, 'xaxis');
-xax.Limits = [xlimlo xlimhi];
-dif = xlimhi - xlimlo;
-xax.TickValues = round([xlimlo xlimlo+(dif/4) xlimlo+2*(dif/4) xlimlo+3*(dif/4) xlimhi], -1);
-xax.TickDirection = 'out';
-xax.TickLength = [yticklength yticklength];
-xlabels = {num2str(xlimlo, '%1.0f'), num2str(xlimhi/4, '%1.0f'), num2str(2*(xlimhi/4), '%1.0f'), num2str(3*(xlimhi/4),'%1.0f'), num2str(xlimhi, '%1.0f')};
-xlabels = cellfun(@(x) strrep(x, ',', '\newline'), xlabels, 'UniformOutput', false);
-xax.TickLabels = xlabels;
-xax.FontName = fontname;
-xax.FontSize = fontsize;
-
-% yaxis
-ylim_lo = 0; ylim_hi = 1;
-yax = get(gca,'yaxis');
-yax.Limits = [ylim_lo ylim_hi];
-yax.TickValues = [ylim_lo (ylim_lo+ylim_hi)/2 ylim_hi];
-yax.TickDirection = 'out';
-yax.TickLength = [xticklength xticklength];
-yax.TickLabels = {num2str(ylim_lo, '%1.2f'), num2str((ylim_lo+ylim_hi)/2, '%1.2f'), num2str(ylim_hi, '%1.2f')};
-yax.FontName = fontname;
-yax.FontSize = fontsize;
-yax.FontAngle = fontangle;
-   
-legend off;
-% legend({'DG', '', 'CA1', '', 'CA23', '', 'SUB', ''})
-box off; 
-% legend('box', 'off');
-% legend('location', 'southeast');
-pbaspect([1 1 1])
-
-[r, p] = corrcoef(d2.task4_rel0acc, d2.task4_rel0rt)
-text(xlimlo+100, ylim_lo+0.10, ['r = ' num2str(r(1, 2), '%1.3f') ', p = ' num2str(p(1, 2), '%1.3f')], ...
-    'FontSize', fontsize)
-
-print(fullfile(rootdir, 'plots', ['speedaccuracytradeoff_' modelspec]), '-dpng')
-print(fullfile(rootdir, 'plots', 'eps', ['speedaccuracytradeoff_' modelspec]), '-depsc')
-
-hold off;
-
-figure(16); 
-modelspec = 'task4_rel1acc ~ task4_rel1rt'; 
-mdl = fitlm(d2, modelspec) %, 'Exclude', find(sum(m.subID == remove, 2)));
-hold on;
-p = plot(mdl); 
-
-color = [128 128 128]/255; 
-p(1).Color = color;
-p(1).Marker = 'o';
-p(1).MarkerFaceColor = color;
-p(1).MarkerEdgeColor = [1 1 1];
-p(1).MarkerSize = markersize;
-p(2).Color = color;
-p(2).LineWidth = linewidth;
-p(3).LineStyle = 'none';
-p(4).LineStyle = 'none';
-x = p(2).XData; y = p(2).YData; CI = (p(4).YData - p(3).YData)/2; 
-patch([x fliplr(x)], [y-CI fliplr(y+CI)], color, 'FaceAlpha',0.2, 'EdgeColor','none')
-clear p;
-
-legend off;
-
-a = gca;
-a.YLabel.String = {'Accuracy (proportion correct)'};
-a.YLabel.FontSize = fontsize;
-a.YLabel.FontAngle = fontangle;
-a.XLabel.String = {'Reaction Time (ms)'};
-a.XLabel.FontSize = fontsize;
-% title('Subregion: CA1')
-title('Rel-1')
-a.TitleFontSizeMultiplier = 2;
-
-% xaxis
-xlimlo = 1000; xlimhi = 8000;
-xax = get(gca, 'xaxis');
-xax.Limits = [xlimlo xlimhi];
-dif = xlimhi - xlimlo;
-xax.TickValues = round([xlimlo xlimlo+(dif/4) xlimlo+2*(dif/4) xlimlo+3*(dif/4) xlimhi], -1);
-xax.TickDirection = 'out';
-xax.TickLength = [yticklength yticklength];
-xlabels = {num2str(xlimlo, '%1.0f'), num2str(xlimhi/4, '%1.0f'), num2str(2*(xlimhi/4), '%1.0f'), num2str(3*(xlimhi/4),'%1.0f'), num2str(xlimhi, '%1.0f')};
-xlabels = cellfun(@(x) strrep(x, ',', '\newline'), xlabels, 'UniformOutput', false);
-xax.TickLabels = xlabels;
-xax.FontName = fontname;
-xax.FontSize = fontsize;
-
-% yaxis
-ylim_lo = 0; ylim_hi = 1;
-yax = get(gca,'yaxis');
-yax.Limits = [ylim_lo ylim_hi];
-yax.TickValues = [ylim_lo (ylim_lo+ylim_hi)/2 ylim_hi];
-yax.TickDirection = 'out';
-yax.TickLength = [xticklength xticklength];
-yax.TickLabels = {num2str(ylim_lo, '%1.2f'), num2str((ylim_lo+ylim_hi)/2, '%1.2f'), num2str(ylim_hi, '%1.2f')};
-yax.FontName = fontname;
-yax.FontSize = fontsize;
-yax.FontAngle = fontangle;
-   
-legend off;
-% legend({'DG', '', 'CA1', '', 'CA23', '', 'SUB', ''})
-box off; 
-% legend('box', 'off');
-% legend('location', 'southeast');
-pbaspect([1 1 1])
-
-[r, p] = corrcoef(d2.task4_rel1acc, d2.task4_rel1rt)
-text(xlimlo+100, ylim_lo+0.10, ['r = ' num2str(r(1, 2), '%1.3f') ', p = ' num2str(p(1, 2), '%1.3f')], ...
-    'FontSize', fontsize)
-
-print(fullfile(rootdir, 'plots', ['speedaccuracytradeoff_' modelspec]), '-dpng')
-print(fullfile(rootdir, 'plots', 'eps', ['speedaccuracytradeoff_' modelspec]), '-depsc')
-
-hold off;
-
-figure(17); 
-modelspec = 'task4_rel2acc ~ task4_rel2rt'; 
-mdl = fitlm(d2, modelspec) %, 'Exclude', find(sum(m.subID == remove, 2)));
-hold on;
-p = plot(mdl); 
-
-color = [128 128 128]/255; 
-p(1).Color = color;
-p(1).Marker = 'o';
-p(1).MarkerFaceColor = color;
-p(1).MarkerEdgeColor = [1 1 1];
-p(1).MarkerSize = markersize;
-p(2).Color = color;
-p(2).LineWidth = linewidth;
-p(3).LineStyle = 'none';
-p(4).LineStyle = 'none';
-x = p(2).XData; y = p(2).YData; CI = (p(4).YData - p(3).YData)/2; 
-patch([x fliplr(x)], [y-CI fliplr(y+CI)], color, 'FaceAlpha',0.2, 'EdgeColor','none')
-clear p;
-
-legend off;
-
-a = gca;
-a.YLabel.String = {'Accuracy (proportion correct)'};
-a.YLabel.FontSize = fontsize;
-a.YLabel.FontAngle = fontangle;
-a.XLabel.String = {'Reaction Time (ms)'};
-a.XLabel.FontSize = fontsize;
-% title('Subregion: CA1')
-title('Rel-2')
-a.TitleFontSizeMultiplier = 2;
-
-% xaxis
-xlimlo = 1000; xlimhi = 8000;
-xax = get(gca, 'xaxis');
-xax.Limits = [xlimlo xlimhi];
-dif = xlimhi - xlimlo;
-xax.TickValues = round([xlimlo xlimlo+(dif/4) xlimlo+2*(dif/4) xlimlo+3*(dif/4) xlimhi], -1);
-xax.TickDirection = 'out';
-xax.TickLength = [yticklength yticklength];
-xlabels = {num2str(xlimlo, '%1.0f'), num2str(xlimhi/4, '%1.0f'), num2str(2*(xlimhi/4), '%1.0f'), num2str(3*(xlimhi/4),'%1.0f'), num2str(xlimhi, '%1.0f')};
-xlabels = cellfun(@(x) strrep(x, ',', '\newline'), xlabels, 'UniformOutput', false);
-xax.TickLabels = xlabels;
-xax.FontName = fontname;
-xax.FontSize = fontsize;
-
-% yaxis
-ylim_lo = 0; ylim_hi = 1;
-yax = get(gca,'yaxis');
-yax.Limits = [ylim_lo ylim_hi];
-yax.TickValues = [ylim_lo (ylim_lo+ylim_hi)/2 ylim_hi];
-yax.TickDirection = 'out';
-yax.TickLength = [xticklength xticklength];
-yax.TickLabels = {num2str(ylim_lo, '%1.2f'), num2str((ylim_lo+ylim_hi)/2, '%1.2f'), num2str(ylim_hi, '%1.2f')};
-yax.FontName = fontname;
-yax.FontSize = fontsize;
-yax.FontAngle = fontangle;
-   
-legend off;
-% legend({'DG', '', 'CA1', '', 'CA23', '', 'SUB', ''})
-box off; 
-% legend('box', 'off');
-% legend('location', 'southeast');
-pbaspect([1 1 1])
-
-[r, p] = corrcoef(d2.task4_rel2acc, d2.task4_rel2rt)
-text(xlimlo+100, ylim_lo+0.10, ['r = ' num2str(r(1, 2), '%1.3f') ', p = ' num2str(p(1, 2), '%1.3f')], ...
-    'FontSize', fontsize)
-
-print(fullfile(rootdir, 'plots', ['speedaccuracytradeoff_' modelspec]), '-dpng')
-print(fullfile(rootdir, 'plots', 'eps', ['speedaccuracytradeoff_' modelspec]), '-depsc')
-
-hold off;
+% % Task 4
+% temp = load(fullfile(rootdir, 'taskperf', 'task4_behavior_n=78.mat'));
+% removetemp1 = temp.subnumbers(find(temp.includeBoolPerf == 0));
+% removetemp2 = temp.subnumbers(find(temp.includeBoolRT == 0));
+% removesubid = unique([removetemp1 removetemp2]);
+% clear temp removetemp1 removetemp2;
+% d2 = d(~ismember(d.subID, removesubid), :); clear temp removesubid;
+% 
+% figure(15); 
+% modelspec = 'task4_rel0acc ~ task4_rel0rt'; 
+% mdl = fitlm(d2, modelspec) %, 'Exclude', find(sum(m.subID == remove, 2)));
+% hold on;
+% p = plot(mdl); 
+% 
+% color = [128 128 128]/255; 
+% p(1).Color = color;
+% p(1).Marker = 'o';
+% p(1).MarkerFaceColor = color;
+% p(1).MarkerEdgeColor = [1 1 1];
+% p(1).MarkerSize = markersize;
+% p(2).Color = color;
+% p(2).LineWidth = linewidth;
+% p(3).LineStyle = 'none';
+% p(4).LineStyle = 'none';
+% x = p(2).XData; y = p(2).YData; CI = (p(4).YData - p(3).YData)/2; 
+% patch([x fliplr(x)], [y-CI fliplr(y+CI)], color, 'FaceAlpha',0.2, 'EdgeColor','none')
+% clear p;
+% 
+% legend off;
+% 
+% a = gca;
+% a.YLabel.String = {'Accuracy (proportion correct)'};
+% a.YLabel.FontSize = fontsize;
+% a.YLabel.FontAngle = fontangle;
+% a.XLabel.String = {'Reaction Time (ms)'};
+% a.XLabel.FontSize = fontsize;
+% % title('Subregion: CA1')
+% title('Rel-0')
+% a.TitleFontSizeMultiplier = 2;
+% 
+% % xaxis
+% xlimlo = 1000; xlimhi = 8000;
+% xax = get(gca, 'xaxis');
+% xax.Limits = [xlimlo xlimhi];
+% dif = xlimhi - xlimlo;
+% xax.TickValues = round([xlimlo xlimlo+(dif/4) xlimlo+2*(dif/4) xlimlo+3*(dif/4) xlimhi], -1);
+% xax.TickDirection = 'out';
+% xax.TickLength = [yticklength yticklength];
+% xlabels = {num2str(xlimlo, '%1.0f'), num2str(xlimhi/4, '%1.0f'), num2str(2*(xlimhi/4), '%1.0f'), num2str(3*(xlimhi/4),'%1.0f'), num2str(xlimhi, '%1.0f')};
+% xlabels = cellfun(@(x) strrep(x, ',', '\newline'), xlabels, 'UniformOutput', false);
+% xax.TickLabels = xlabels;
+% xax.FontName = fontname;
+% xax.FontSize = fontsize;
+% 
+% % yaxis
+% ylim_lo = 0; ylim_hi = 1;
+% yax = get(gca,'yaxis');
+% yax.Limits = [ylim_lo ylim_hi];
+% yax.TickValues = [ylim_lo (ylim_lo+ylim_hi)/2 ylim_hi];
+% yax.TickDirection = 'out';
+% yax.TickLength = [xticklength xticklength];
+% yax.TickLabels = {num2str(ylim_lo, '%1.2f'), num2str((ylim_lo+ylim_hi)/2, '%1.2f'), num2str(ylim_hi, '%1.2f')};
+% yax.FontName = fontname;
+% yax.FontSize = fontsize;
+% yax.FontAngle = fontangle;
+%    
+% legend off;
+% % legend({'DG', '', 'CA1', '', 'CA23', '', 'SUB', ''})
+% box off; 
+% % legend('box', 'off');
+% % legend('location', 'southeast');
+% pbaspect([1 1 1])
+% 
+% [r, p] = corrcoef(d2.task4_rel0acc, d2.task4_rel0rt)
+% text(xlimlo+100, ylim_lo+0.10, ['r = ' num2str(r(1, 2), '%1.3f') ', p = ' num2str(p(1, 2), '%1.3f')], ...
+%     'FontSize', fontsize)
+% 
+% print(fullfile(rootdir, 'plots', ['speedaccuracytradeoff_' modelspec]), '-dpng')
+% print(fullfile(rootdir, 'plots', 'eps', ['speedaccuracytradeoff_' modelspec]), '-depsc')
+% 
+% hold off;
+% 
+% figure(16); 
+% modelspec = 'task4_rel1acc ~ task4_rel1rt'; 
+% mdl = fitlm(d2, modelspec) %, 'Exclude', find(sum(m.subID == remove, 2)));
+% hold on;
+% p = plot(mdl); 
+% 
+% color = [128 128 128]/255; 
+% p(1).Color = color;
+% p(1).Marker = 'o';
+% p(1).MarkerFaceColor = color;
+% p(1).MarkerEdgeColor = [1 1 1];
+% p(1).MarkerSize = markersize;
+% p(2).Color = color;
+% p(2).LineWidth = linewidth;
+% p(3).LineStyle = 'none';
+% p(4).LineStyle = 'none';
+% x = p(2).XData; y = p(2).YData; CI = (p(4).YData - p(3).YData)/2; 
+% patch([x fliplr(x)], [y-CI fliplr(y+CI)], color, 'FaceAlpha',0.2, 'EdgeColor','none')
+% clear p;
+% 
+% legend off;
+% 
+% a = gca;
+% a.YLabel.String = {'Accuracy (proportion correct)'};
+% a.YLabel.FontSize = fontsize;
+% a.YLabel.FontAngle = fontangle;
+% a.XLabel.String = {'Reaction Time (ms)'};
+% a.XLabel.FontSize = fontsize;
+% % title('Subregion: CA1')
+% title('Rel-1')
+% a.TitleFontSizeMultiplier = 2;
+% 
+% % xaxis
+% xlimlo = 1000; xlimhi = 8000;
+% xax = get(gca, 'xaxis');
+% xax.Limits = [xlimlo xlimhi];
+% dif = xlimhi - xlimlo;
+% xax.TickValues = round([xlimlo xlimlo+(dif/4) xlimlo+2*(dif/4) xlimlo+3*(dif/4) xlimhi], -1);
+% xax.TickDirection = 'out';
+% xax.TickLength = [yticklength yticklength];
+% xlabels = {num2str(xlimlo, '%1.0f'), num2str(xlimhi/4, '%1.0f'), num2str(2*(xlimhi/4), '%1.0f'), num2str(3*(xlimhi/4),'%1.0f'), num2str(xlimhi, '%1.0f')};
+% xlabels = cellfun(@(x) strrep(x, ',', '\newline'), xlabels, 'UniformOutput', false);
+% xax.TickLabels = xlabels;
+% xax.FontName = fontname;
+% xax.FontSize = fontsize;
+% 
+% % yaxis
+% ylim_lo = 0; ylim_hi = 1;
+% yax = get(gca,'yaxis');
+% yax.Limits = [ylim_lo ylim_hi];
+% yax.TickValues = [ylim_lo (ylim_lo+ylim_hi)/2 ylim_hi];
+% yax.TickDirection = 'out';
+% yax.TickLength = [xticklength xticklength];
+% yax.TickLabels = {num2str(ylim_lo, '%1.2f'), num2str((ylim_lo+ylim_hi)/2, '%1.2f'), num2str(ylim_hi, '%1.2f')};
+% yax.FontName = fontname;
+% yax.FontSize = fontsize;
+% yax.FontAngle = fontangle;
+%    
+% legend off;
+% % legend({'DG', '', 'CA1', '', 'CA23', '', 'SUB', ''})
+% box off; 
+% % legend('box', 'off');
+% % legend('location', 'southeast');
+% pbaspect([1 1 1])
+% 
+% [r, p] = corrcoef(d2.task4_rel1acc, d2.task4_rel1rt)
+% text(xlimlo+100, ylim_lo+0.10, ['r = ' num2str(r(1, 2), '%1.3f') ', p = ' num2str(p(1, 2), '%1.3f')], ...
+%     'FontSize', fontsize)
+% 
+% print(fullfile(rootdir, 'plots', ['speedaccuracytradeoff_' modelspec]), '-dpng')
+% print(fullfile(rootdir, 'plots', 'eps', ['speedaccuracytradeoff_' modelspec]), '-depsc')
+% 
+% hold off;
+% 
+% figure(17); 
+% modelspec = 'task4_rel2acc ~ task4_rel2rt'; 
+% mdl = fitlm(d2, modelspec) %, 'Exclude', find(sum(m.subID == remove, 2)));
+% hold on;
+% p = plot(mdl); 
+% 
+% color = [128 128 128]/255; 
+% p(1).Color = color;
+% p(1).Marker = 'o';
+% p(1).MarkerFaceColor = color;
+% p(1).MarkerEdgeColor = [1 1 1];
+% p(1).MarkerSize = markersize;
+% p(2).Color = color;
+% p(2).LineWidth = linewidth;
+% p(3).LineStyle = 'none';
+% p(4).LineStyle = 'none';
+% x = p(2).XData; y = p(2).YData; CI = (p(4).YData - p(3).YData)/2; 
+% patch([x fliplr(x)], [y-CI fliplr(y+CI)], color, 'FaceAlpha',0.2, 'EdgeColor','none')
+% clear p;
+% 
+% legend off;
+% 
+% a = gca;
+% a.YLabel.String = {'Accuracy (proportion correct)'};
+% a.YLabel.FontSize = fontsize;
+% a.YLabel.FontAngle = fontangle;
+% a.XLabel.String = {'Reaction Time (ms)'};
+% a.XLabel.FontSize = fontsize;
+% % title('Subregion: CA1')
+% title('Rel-2')
+% a.TitleFontSizeMultiplier = 2;
+% 
+% % xaxis
+% xlimlo = 1000; xlimhi = 8000;
+% xax = get(gca, 'xaxis');
+% xax.Limits = [xlimlo xlimhi];
+% dif = xlimhi - xlimlo;
+% xax.TickValues = round([xlimlo xlimlo+(dif/4) xlimlo+2*(dif/4) xlimlo+3*(dif/4) xlimhi], -1);
+% xax.TickDirection = 'out';
+% xax.TickLength = [yticklength yticklength];
+% xlabels = {num2str(xlimlo, '%1.0f'), num2str(xlimhi/4, '%1.0f'), num2str(2*(xlimhi/4), '%1.0f'), num2str(3*(xlimhi/4),'%1.0f'), num2str(xlimhi, '%1.0f')};
+% xlabels = cellfun(@(x) strrep(x, ',', '\newline'), xlabels, 'UniformOutput', false);
+% xax.TickLabels = xlabels;
+% xax.FontName = fontname;
+% xax.FontSize = fontsize;
+% 
+% % yaxis
+% ylim_lo = 0; ylim_hi = 1;
+% yax = get(gca,'yaxis');
+% yax.Limits = [ylim_lo ylim_hi];
+% yax.TickValues = [ylim_lo (ylim_lo+ylim_hi)/2 ylim_hi];
+% yax.TickDirection = 'out';
+% yax.TickLength = [xticklength xticklength];
+% yax.TickLabels = {num2str(ylim_lo, '%1.2f'), num2str((ylim_lo+ylim_hi)/2, '%1.2f'), num2str(ylim_hi, '%1.2f')};
+% yax.FontName = fontname;
+% yax.FontSize = fontsize;
+% yax.FontAngle = fontangle;
+%    
+% legend off;
+% % legend({'DG', '', 'CA1', '', 'CA23', '', 'SUB', ''})
+% box off; 
+% % legend('box', 'off');
+% % legend('location', 'southeast');
+% pbaspect([1 1 1])
+% 
+% [r, p] = corrcoef(d2.task4_rel2acc, d2.task4_rel2rt)
+% text(xlimlo+100, ylim_lo+0.10, ['r = ' num2str(r(1, 2), '%1.3f') ', p = ' num2str(p(1, 2), '%1.3f')], ...
+%     'FontSize', fontsize)
+% 
+% print(fullfile(rootdir, 'plots', ['speedaccuracytradeoff_' modelspec]), '-dpng')
+% print(fullfile(rootdir, 'plots', 'eps', ['speedaccuracytradeoff_' modelspec]), '-depsc')
+% 
+% hold off;
 
 % Task 5
 temp = load(fullfile(rootdir, 'taskperf', 'task5_behavior_n=78.mat'));
@@ -1515,18 +1516,18 @@ save(fullfile(rootdir, 'supportFiles', filename), 'd2')
 writetable(d2, fullfile(rootdir, 'supportFiles', [filename '.csv']))
 clear d2;
 
-%% Task 4: Relational reasoning, Schlichting et al., 2017, Crone and Bunge
-% Remove data identified as outliers by Schlichting et al., 2017. 
-temp = load(fullfile(rootdir, 'taskperf', 'task4_behavior_n=78.mat'));
-removetemp1 = temp.subnumbers(find(temp.includeBoolPerf == 0));
-removetemp2 = temp.subnumbers(find(temp.includeBoolRT == 0));
-removesubid = unique([removetemp1 removetemp2]);
-clear temp removetemp1 removetemp2;
-d2 = d(~ismember(d.subID, removesubid), :); clear temp;
-filename = sprintf('devti_data_beh_forSPSS_task4outliersremoved_%s', datestr(now,'yyyymmdd'));
-save(fullfile(rootdir, 'supportFiles', filename), 'd2')
-writetable(d2, fullfile(rootdir, 'supportFiles', [filename '.csv']))
-clear d2;
+% %% Task 4: Relational reasoning, Schlichting et al., 2017, Crone and Bunge
+% % Remove data identified as outliers by Schlichting et al., 2017. 
+% temp = load(fullfile(rootdir, 'taskperf', 'task4_behavior_n=78.mat'));
+% removetemp1 = temp.subnumbers(find(temp.includeBoolPerf == 0));
+% removetemp2 = temp.subnumbers(find(temp.includeBoolRT == 0));
+% removesubid = unique([removetemp1 removetemp2]);
+% clear temp removetemp1 removetemp2;
+% d2 = d(~ismember(d.subID, removesubid), :); clear temp;
+% filename = sprintf('devti_data_beh_forSPSS_task4outliersremoved_%s', datestr(now,'yyyymmdd'));
+% save(fullfile(rootdir, 'supportFiles', filename), 'd2')
+% writetable(d2, fullfile(rootdir, 'supportFiles', [filename '.csv']))
+% clear d2;
 
 %% Task 5: Relational Inference, Wendelken and Bunge
 % Remove data identified as outliers by Schlichting et al., 2017. 
