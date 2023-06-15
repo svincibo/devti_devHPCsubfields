@@ -40,20 +40,20 @@ yticklength = 0;
 xticklength = 0.02;
 
 gray = [128 128 128]/255;
-head = [204 204 0]/255; % light burnt yellow
-body = [204 190 0]/255; % burnt yellow
-tail =  [210 43 43]/255; % cadmium red
+head = [128 128 128]/255; %[204 204 0]/255; % light burnt yellow
+body = [128 128 128]/255; %[204 190 0]/255; % burnt yellow
+tail =  [128 128 128]/255; %[210 43 43]/255; % cadmium red
 
-hip = [2 129 129]/255; % dark turquoise
+hip = [128 128 128]/255; %[2 129 129]/255; % dark turquoise
 
-ca1color = [0 150 255]/255;
-ca23color = [199 21 133]/255;
-dgcolor = [75 0 130]/255;
-subcolor = [60 179 113]/255;
+ca1color = [128 128 128]/255; %[0 150 255]/255;
+ca23color = [128 128 128]/255; %[199 21 133]/255;
+dgcolor = [128 128 128]/255; %[75 0 130]/255;
+subcolor = [128 128 128]/255; %[60 179 113]/255;
 
-yc_color  = [50 180 100]/255; 
-oc_color = [50 100 180]/255; 
-a_color = [100 50 180]/255;
+% yc_color  = [50 180 100]/255; 
+% oc_color = [50 100 180]/255; 
+% a_color = [100 50 180]/255;
 
 if strcmp(wm, 'fa')
     ylim_lo = 0.11; ylim_hi = 0.34;
@@ -533,7 +533,7 @@ mdlci = fitlm(t, 'y~x^2');
 pci = plot(mdlci);
 x = pci(2).XData; y = pci(2).YData; CI = (pci(4).YData - pci(3).YData)/2; 
 patch([x fliplr(x)], [y-CI fliplr(y+CI)], gray, 'FaceAlpha',0.2, 'EdgeColor','none')
-pci(1).Marker = 'none'; pci(4).Color = color;
+pci(1).Marker = 'none'; pci(2).Color = color;
 pci(3).LineStyle = 'none'; pci(4).LineStyle = 'none'; 
 clear p pci;
 
@@ -554,7 +554,7 @@ end
 a.YLabel.FontSize = fontsize;
 a.YLabel.FontAngle = fontangle;
 
-a.XLabel.String = {'Age'; '(adjusted)'};
+a.XLabel.String = {'Age'};
 a.XLabel.FontSize = fontsize;
 % title('Subregion: CA23')
 title('')
@@ -609,7 +609,7 @@ end
 a.YLabel.FontSize = fontsize;
 a.YLabel.FontAngle = fontangle;
 
-a.XLabel.String = {'Age'; '(adjusted)'};
+a.XLabel.String = {'Age'};
 a.XLabel.FontSize = fontsize;
 % title('Subregion: CA23')
 title('')
