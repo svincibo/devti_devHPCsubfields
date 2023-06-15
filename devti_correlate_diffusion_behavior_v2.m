@@ -369,7 +369,7 @@ pci = plot(mdlci);
 x = pci(2).XData; y = pci(2).YData; CI = (pci(4).YData - pci(3).YData)/2; 
 patch([x fliplr(x)], [y-CI fliplr(y+CI)], [128 128 128]/255, 'FaceAlpha',0.2, 'EdgeColor','none')
 pci(1).Marker = 'none';
-pci(3).LineStyle = 'none'; pci(4).LineStyle = 'none'; 
+pci(2).LineStyle = 'none'; pci(3).LineStyle = 'none'; pci(4).LineStyle = 'none'; 
 clear p s pci;
 
 a = gca;
@@ -381,7 +381,7 @@ end
 a.YLabel.FontSize = fontsize;
 a.YLabel.FontAngle = fontangle;
 
-a.XLabel.String = {'Gen Direct Accuracy'; '(adjusted)'};
+a.XLabel.String = {'P Matching Accuracy'};
 a.XLabel.FontSize = fontsize;
 title('Cornu Ammonis 1 (CA1)')
 
@@ -471,7 +471,7 @@ pci = plot(mdlci);
 x = pci(2).XData; y = pci(2).YData; CI = (pci(4).YData - pci(3).YData)/2; 
 patch([x fliplr(x)], [y-CI fliplr(y+CI)], [128 128 128]/255, 'FaceAlpha',0.2, 'EdgeColor','none')
 pci(1).Marker = 'none';
-pci(3).LineStyle = 'none'; pci(4).LineStyle = 'none'; 
+pci(2).LineStyle = 'none'; pci(3).LineStyle = 'none'; pci(4).LineStyle = 'none'; 
 clear p s pci;
 
 a = gca;
@@ -483,7 +483,7 @@ end
 a.YLabel.FontSize = fontsize;
 a.YLabel.FontAngle = fontangle;
 
-a.XLabel.String = {'AC Inference Accuracy'; '(adjusted)'};
+a.XLabel.String = {'M Inference Accuracy'};
 a.XLabel.FontSize = fontsize;
 title('Dentate Gyrus (DG)')
 
@@ -573,7 +573,7 @@ pci = plot(mdlci);
 x = pci(2).XData; y = pci(2).YData; CI = (pci(4).YData - pci(3).YData)/2; 
 patch([x fliplr(x)], [y-CI fliplr(y+CI)], [128 128 128]/255, 'FaceAlpha',0.2, 'EdgeColor','none')
 pci(1).Marker = 'none';
-pci(3).LineStyle = 'none'; pci(4).LineStyle = 'none'; 
+pci(2).LineStyle = 'none'; pci(3).LineStyle = 'none'; pci(4).LineStyle = 'none'; 
 clear p s pci;
 
 a = gca;
@@ -585,7 +585,7 @@ end
 a.YLabel.FontSize = fontsize;
 a.YLabel.FontAngle = fontangle;
 
-a.XLabel.String = {'Gen Inference Accuracy'; '(adjusted)'};
+a.XLabel.String = {'P Inference Accuracy'};
 a.XLabel.FontSize = fontsize;
 title('Subiculum (SUB)')
 
